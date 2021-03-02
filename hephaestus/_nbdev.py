@@ -2,12 +2,12 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"func": "00_core.ipynb"}
+index = {"example_func": "00_example.ipynb"}
 
-modules = ["core.py"]
+modules = ["example.py"]
 
-doc_url = "https://user.github.io/hephaestus/"
+doc_url = "https://WM-SEMERU.github.io/hephaestus/"
 
-git_url = "https://github.com/user/hephaestus/tree/branch/"
+git_url = "https://github.com/WM-SEMERU/hephaestus/tree/main/"
 
 def custom_doc_links(name): return None

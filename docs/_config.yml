@@ -1,4 +1,4 @@
-repository: {user}/{lib_name}
+repository: WM-SEMERU/{lib_name}
 output: web
 topnav_title: {lib_name}
 site_title: {lib_name}

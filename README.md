@@ -1,5 +1,5 @@
-# Project name here
-> Summary description here.
+# Hephaestus
+> Summary description here asdf 
 
 
 This file will become your README and also the index of your documentation.
@@ -13,12 +13,8 @@ This file will become your README and also the index of your documentation.
 Fill me in please! Don't forget code examples:
 
 ```
-1+1
+example_func()
 ```
 
-
-
-
-    2
-
-
+    6969
+    

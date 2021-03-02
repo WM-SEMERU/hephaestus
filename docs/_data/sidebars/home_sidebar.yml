@@ -10,8 +10,8 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: module name here
-      url: core.html
+      title: example
+      url: example.html
     output: web
     title: hephaestus
   output: web
