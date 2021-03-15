@@ -2,9 +2,14 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"example_func": "00_example.ipynb"}
+index = {"InsertOperation": "00_EditOperations.ipynb",
+         "DeleteOperation": "00_EditOperations.ipynb",
+         "ReplaceOperation": "00_EditOperations.ipynb",
+         "EditOperation": "00_EditOperations.ipynb",
+         "AbstractMethod": "01_AbstractMethod.ipynb"}
 
-modules = ["example.py"]
+modules = ["EditOperations.py",
+           "AbstractMethod.py"]
 
 doc_url = "https://WM-SEMERU.github.io/hephaestus/"
 

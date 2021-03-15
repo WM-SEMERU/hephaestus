@@ -1,6 +1,7 @@
 {
   "hephaestus": {
     "Overview": "/",
-    "example": "example.html"
+    "EditOperations": "EditOperations.html",
+    "AbstractMethod": "AbstractMethod.html"
   }
 }

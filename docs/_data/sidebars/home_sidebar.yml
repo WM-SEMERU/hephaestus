@@ -10,8 +10,11 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: example
-      url: example.html
+      title: EditOperations
+      url: EditOperations.html
+    - output: web,pdf
+      title: AbstractMethod
+      url: AbstractMethod.html
     output: web
     title: hephaestus
   output: web
