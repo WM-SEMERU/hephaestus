@@ -63,17 +63,20 @@ class HephaestusModel:
     ) -> None:
         """
         Trains the model with the given parameters. Files containing AbstractMethods should have one per line with
-        tokens separated by spaces. Corresponding AbstractMethods in source/target file pairs should share line numbers.
+        tokens separated by spaces. 'source' files must contain AbstractMethods. 'target' files may contain
+        AbstractMethods or EditOperations.
 
         As the training progesses, checkpoint model files are created which follow the format `model_step_#.pt`, where
         `#` corresponds to the training step number. Once training is complete, the finalized model is outputted to
         `model_final.pt`.
 
         Required args:
-        - `trainSource`: File name contatining training source data, i.e. buggy AbstractMethods in the training set.
-        - `trainTarget`: File name contatining training target data, i.e. fixed AbstractMethods in the training set.
-        - `validSource`: File name contatining validation source data, i.e. buggy AbstractMethods in the validation set.
-        - `validTarget`: File name contatining validation target data, i.e. fixed AbstractMethods in the validation set.
+        - `trainSource`: File name contatining training source data, must be buggy AbstractMethods.
+        - `trainTarget`: File name contatining training target data, can be fixed AbstractMethods or EditOperations
+          describing buggy -> fixed.
+        - `validSource`: File name contatining validation source data, must be buggy AbstractMethods.
+        - `validTarget`: File name contatining validation target data, must be the same type of data provided in
+          `trainTarget`.
 
         Optional args:
         - `vocabSamples`: Number of transformed samples per corpus to use when building vocabulary. Defaults to 10000.
@@ -93,20 +96,16 @@ class HephaestusModel:
 
         # determine number of validation and checkpoint steps if none were given
         if validSteps is None:
-            validSteps = trainSteps // 2
+            validSteps = max(trainSteps // 2, 1)
         if saveCheckpointSteps is None:
-            saveCheckpointSteps = trainSteps // 2
+            saveCheckpointSteps = max(trainSteps // 2, 1)
 
         # write config file
         self.__writeConfigFile(trainSource, trainTarget, validSource, validTarget, numGPUs = numGPUs,
                 trainSteps = trainSteps, validSteps = validSteps, saveCheckpointSteps = saveCheckpointSteps)
 
         # build vocabulary
-        runCommand(["onmt_build_vocab",
-            "-config", self.__CONFIG_PATH,
-            "-n_sample", str(vocabSamples),
-            ""
-        ])
+        runCommand(["onmt_build_vocab -config '{}' -n_sample {}".format(self.__CONFIG_PATH, vocabSamples)])
 
         # delete previous model files
         for file in os.listdir(self.__MODEL_DIR):
@@ -114,7 +113,7 @@ class HephaestusModel:
                 os.remove(os.path.join(self.__MODEL_DIR, file))
 
         # train the model
-        runCommand(["onmt_train", "-config", self.__CONFIG_PATH])
+        runCommand(["onmt_train -config '{}'".format(self.__CONFIG_PATH)])
 
         # find and release the highest trained model
         latestModel = None
@@ -128,17 +127,17 @@ class HephaestusModel:
                     maxNum = stepNum
 
         if latestModel is not None:
-            runCommand(["onmt_release_model", "--model", latestModel, "--output", self.__FINAL_MODEL_PATH])
+            runCommand(["onmt_release_model --model '{}' --output '{}'".format(latestModel, self.__FINAL_MODEL_PATH)])
 
     def translate(self,
         buggy: Union[str, AbstractMethod, List[AbstractMethod]],
         modelFile: str = None,
-        postprocess: bool = True
+        applyEditOperations: bool = True
     ) -> Union[AbstractMethod, List[AbstractMethod]]:
         """
-        Translates the given `buggy` AbstractMethods into supposedly fixed AbstractMethods and writes them to
-        `<model_directory>/output.txt`. Depending on what type of value is passed to `buggy`, the return value
-        of this method changes according to the following:
+        Translates the given `buggy` AbstractMethods into supposedly fixed AbstractMethods, writes them to
+        `<model_directory>/output.txt`, and then returns them. Depending on what type of value is passed to
+        `buggy`, the return value of this method changes according to the following:
 
         | `buggy` type           | Return type            |
         | :--------------------- | :--------------------- |
@@ -148,10 +147,12 @@ class HephaestusModel:
 
         Optional args:
         - `modelFile`: A `.pt` file which is used for translation instead of the default `model_final.pt`
-        - `postprocess`: When set to True, a postprocessing stage occurs which converts raw model output into
-          EditOperations and applies them to the inputted AbstractMethods, resulting in supposedly fixed
-          methods. If the model was trained with EditOperations, this should be True; if the model was trained
-          with just AbstractMethods for the control group, then this should be False. Defaults to True.
+        - `applyEditOperations`: When set to True, the model output is interpreted as EditOperations -- a
+          postprocessing stage occurs where the outputted EditOperations are applied to the inputted
+          AbstractMethods. When set to False, the raw output is interpreted as AbstractMethods and returned
+          without a postprocessing stage. If the model was trained with EditOperations, `applyEditOperations`
+          should be True; if the model was trained with just AbstractMethods as in for the control group,
+          then this should be False. Defaults to True.
         """
 
         # determine which model file to use, and raise an error if it doesn't exist
@@ -169,7 +170,7 @@ class HephaestusModel:
             buggyFile = buggy
 
         # translate the buggy methods
-        command = ["onmt_translate", "-model", modelFile, "-src", buggyFile, "-output", self.__OUTPUT_PATH]
+        command = ["onmt_translate -model '{}' -src '{}' -output '{}'".format(modelFile, buggyFile, self.__OUTPUT_PATH)]
         if getYamlParameter(self.__CONFIG_PATH, "world_size") is not None: # if GPU should be used
             command += ["-gpu", "0"]
         runCommand(command)
@@ -191,7 +192,7 @@ class HephaestusModel:
         fixedMethods = []
         for inputMethod, outputLine in zip(inputMethods, outputLines):
 
-            if postprocess:
+            if applyEditOperations:
                 # TODO: extract edit operations and apply them to the inputMethod
                 # inputMethod.applyEditOperations(...)
                 # fixedMethods.append(inputMethod)
@@ -227,10 +228,12 @@ class HephaestusModel:
             "    corpus_1:",
             "        path_src: {}".format(args[0].replace(os.path.sep, "/")),
             "        path_tgt: {}".format(args[1].replace(os.path.sep, "/")),
+            "        transforms: []",
             "        weight: 1",
             "    valid:",
             "        path_src: {}".format(args[2].replace(os.path.sep, "/")),
             "        path_tgt: {}".format(args[3].replace(os.path.sep, "/")),
+            "        transforms: []",
             "",
             "# Checkpoints will be saved here",
             "save_model: {}".format(self.__SAVE_MODEL_PATH.replace(os.path.sep, "/")),

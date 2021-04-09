@@ -83,16 +83,19 @@ will attempt to create it.</li>
 <h4 id="HephaestusModel.train" class="doc_header"><code>HephaestusModel.train</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/HephaestusModel.py#L50" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>HephaestusModel.train</code>(<strong><code>trainSource</code></strong>:<code>str</code>, <strong><code>trainTarget</code></strong>:<code>str</code>, <strong><code>validSource</code></strong>:<code>str</code>, <strong><code>validTarget</code></strong>:<code>str</code>, <strong><code>vocabSamples</code></strong>:<code>int</code>=<em><code>10000</code></em>, <strong><code>numGPUs</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>trainSteps</code></strong>:<code>int</code>=<em><code>1000</code></em>, <strong><code>validSteps</code></strong>:<code>int</code>=<em><code>None</code></em>, <strong><code>saveCheckpointSteps</code></strong>:<code>int</code>=<em><code>None</code></em>)</p>
 </blockquote>
 <p>Trains the model with the given parameters. Files containing AbstractMethods should have one per line with
-tokens separated by spaces. Corresponding AbstractMethods in source/target file pairs should share line numbers.</p>
+tokens separated by spaces. 'source' files must contain AbstractMethods. 'target' files may contain
+AbstractMethods or EditOperations.</p>
 <p>As the training progesses, checkpoint model files are created which follow the format <code>model_step_#.pt</code>, where
 <code>#</code> corresponds to the training step number. Once training is complete, the finalized model is outputted to
 <code>model_final.pt</code>.</p>
 <p>Required args:</p>
 <ul>
-<li><code>trainSource</code>: File name contatining training source data, i.e. buggy AbstractMethods in the training set.</li>
-<li><code>trainTarget</code>: File name contatining training target data, i.e. fixed AbstractMethods in the training set.</li>
-<li><code>validSource</code>: File name contatining validation source data, i.e. buggy AbstractMethods in the validation set.</li>
-<li><code>validTarget</code>: File name contatining validation target data, i.e. fixed AbstractMethods in the validation set.</li>
+<li><code>trainSource</code>: File name contatining training source data, must be buggy AbstractMethods.</li>
+<li><code>trainTarget</code>: File name contatining training target data, can be fixed AbstractMethods or EditOperations
+describing buggy -&gt; fixed.</li>
+<li><code>validSource</code>: File name contatining validation source data, must be buggy AbstractMethods.</li>
+<li><code>validTarget</code>: File name contatining validation target data, must be the same type of data provided in
+<code>trainTarget</code>.</li>
 </ul>
 <p>Optional args:</p>
 <ul>
@@ -129,11 +132,11 @@ Defaults to <code>trainSteps</code> / 2.</li>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="HephaestusModel.translate" class="doc_header"><code>HephaestusModel.translate</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/HephaestusModel.py#L133" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>HephaestusModel.translate</code>(<strong><code>buggy</code></strong>:<code>Union</code>[<code>str</code>, <a href="/hephaestus/AbstractMethod.html"><code>AbstractMethod</code></a>, <code>List</code>[<a href="/hephaestus/AbstractMethod.html"><code>AbstractMethod</code></a>]], <strong><code>modelFile</code></strong>:<code>str</code>=<em><code>None</code></em>, <strong><code>postprocess</code></strong>:<code>bool</code>=<em><code>True</code></em>)</p>
+<h4 id="HephaestusModel.translate" class="doc_header"><code>HephaestusModel.translate</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/HephaestusModel.py#L132" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>HephaestusModel.translate</code>(<strong><code>buggy</code></strong>:<code>Union</code>[<code>str</code>, <a href="/hephaestus/AbstractMethod.html"><code>AbstractMethod</code></a>, <code>List</code>[<a href="/hephaestus/AbstractMethod.html"><code>AbstractMethod</code></a>]], <strong><code>modelFile</code></strong>:<code>str</code>=<em><code>None</code></em>, <strong><code>applyEditOperations</code></strong>:<code>bool</code>=<em><code>True</code></em>)</p>
 </blockquote>
-<p>Translates the given <code>buggy</code> AbstractMethods into supposedly fixed AbstractMethods and writes them to
-<code>&lt;model_directory&gt;/output.txt</code>. Depending on what type of value is passed to <code>buggy</code>, the return value
-of this method changes according to the following:</p>
+<p>Translates the given <code>buggy</code> AbstractMethods into supposedly fixed AbstractMethods, writes them to
+<code>&lt;model_directory&gt;/output.txt</code>, and then returns them. Depending on what type of value is passed to
+<code>buggy</code>, the return value of this method changes according to the following:</p>
 <table>
 <thead><tr>
 <th style="text-align:left"><code>buggy</code> type</th>
@@ -158,10 +161,12 @@ of this method changes according to the following:</p>
 <p>Optional args:</p>
 <ul>
 <li><code>modelFile</code>: A <code>.pt</code> file which is used for translation instead of the default <code>model_final.pt</code></li>
-<li><code>postprocess</code>: When set to True, a postprocessing stage occurs which converts raw model output into
-EditOperations and applies them to the inputted AbstractMethods, resulting in supposedly fixed
-methods. If the model was trained with EditOperations, this should be True; if the model was trained
-with just AbstractMethods for the control group, then this should be False. Defaults to True.</li>
+<li><code>applyEditOperations</code>: When set to True, the model output is interpreted as EditOperations -- a
+postprocessing stage occurs where the outputted EditOperations are applied to the inputted
+AbstractMethods. When set to False, the raw output is interpreted as AbstractMethods and returned
+without a postprocessing stage. If the model was trained with EditOperations, <code>applyEditOperations</code>
+should be True; if the model was trained with just AbstractMethods as in for the control group,
+then this should be False. Defaults to True.</li>
 </ul>
 
 </div>
@@ -211,7 +216,8 @@ with just AbstractMethods for the control group, then this should be False. Defa
     <span class="s2">&quot;../data/small/valid_fixed.txt&quot;</span><span class="p">,</span>
     <span class="n">numGPUs</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">trainSteps</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
-    <span class="n">validSteps</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">validSteps</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="n">saveCheckpointSteps</span> <span class="o">=</span> <span class="mi">250</span>
 <span class="p">)</span>
 </pre></div>
 
@@ -228,28 +234,28 @@ with just AbstractMethods for the control group, then this should be False. Defa
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[2021-04-09 08:33:22,022 INFO] Counter vocab from 10000 samples.
-[2021-04-09 08:33:22,022 INFO] Build vocab on 10000 transformed examples/corpus.
-[2021-04-09 08:33:22,044 INFO] corpus_1&#39;s transforms: TransformPipe()
-[2021-04-09 08:33:22,055 INFO] Loading ParallelCorpus(../data/small/train_buggy.txt, ../data/small/train_fixed.txt, align=None)...
-[2021-04-09 08:33:22,625 INFO] Counters src:411
-[2021-04-09 08:33:22,625 INFO] Counters tgt:403
-[2021-04-09 08:33:22,629 WARNING] path test_model/save_data.vocab.src exists, may overwrite...
-[2021-04-09 08:33:22,646 WARNING] path test_model/save_data.vocab.tgt exists, may overwrite...
-[2021-04-09 08:33:23,707 INFO] Parsed 2 corpora from -data.
-[2021-04-09 08:33:23,714 INFO] Get special vocabs from Transforms: {&#39;src&#39;: set(), &#39;tgt&#39;: set()}.
-[2021-04-09 08:33:23,714 INFO] Loading vocab from text file...
-[2021-04-09 08:33:23,714 INFO] Loading src vocabulary from test_model/save_data.vocab.src
-[2021-04-09 08:33:23,732 INFO] Loaded src vocab has 411 tokens.
-[2021-04-09 08:33:23,732 INFO] Loading tgt vocabulary from test_model/save_data.vocab.tgt
-[2021-04-09 08:33:23,743 INFO] Loaded tgt vocab has 403 tokens.
-[2021-04-09 08:33:23,743 INFO] Building fields with vocab in counters...
-[2021-04-09 08:33:23,744 INFO]  * tgt vocab size: 407.
-[2021-04-09 08:33:23,745 INFO]  * src vocab size: 413.
-[2021-04-09 08:33:23,745 INFO]  * src vocab size = 413
-[2021-04-09 08:33:23,745 INFO]  * tgt vocab size = 407
-[2021-04-09 08:33:23,745 INFO] Building model...
-[2021-04-09 08:33:23,956 INFO] NMTModel(
+<pre>[2021-04-09 15:43:01,600 INFO] Counter vocab from 10000 samples.
+[2021-04-09 15:43:01,601 INFO] Build vocab on 10000 transformed examples/corpus.
+[2021-04-09 15:43:01,623 INFO] corpus_1&#39;s transforms: TransformPipe()
+[2021-04-09 15:43:01,633 INFO] Loading ParallelCorpus(../data/small/train_buggy.txt, ../data/small/train_fixed.txt, align=None)...
+[2021-04-09 15:43:02,403 INFO] Counters src:411
+[2021-04-09 15:43:02,404 INFO] Counters tgt:403
+[2021-04-09 15:43:02,435 WARNING] path test_model/save_data.vocab.src exists, may overwrite...
+[2021-04-09 15:43:02,465 WARNING] path test_model/save_data.vocab.tgt exists, may overwrite...
+[2021-04-09 15:43:05,550 INFO] Parsed 2 corpora from -data.
+[2021-04-09 15:43:05,725 INFO] Get special vocabs from Transforms: {&#39;src&#39;: set(), &#39;tgt&#39;: set()}.
+[2021-04-09 15:43:05,726 INFO] Loading vocab from text file...
+[2021-04-09 15:43:05,726 INFO] Loading src vocabulary from test_model/save_data.vocab.src
+[2021-04-09 15:43:05,900 INFO] Loaded src vocab has 411 tokens.
+[2021-04-09 15:43:05,900 INFO] Loading tgt vocabulary from test_model/save_data.vocab.tgt
+[2021-04-09 15:43:05,935 INFO] Loaded tgt vocab has 403 tokens.
+[2021-04-09 15:43:05,935 INFO] Building fields with vocab in counters...
+[2021-04-09 15:43:05,936 INFO]  * tgt vocab size: 407.
+[2021-04-09 15:43:05,937 INFO]  * src vocab size: 413.
+[2021-04-09 15:43:05,938 INFO]  * src vocab size = 413
+[2021-04-09 15:43:05,938 INFO]  * tgt vocab size = 407
+[2021-04-09 15:43:05,938 INFO] Building model...
+[2021-04-09 15:43:06,693 INFO] NMTModel(
   (encoder): RNNEncoder(
     (embeddings): Embeddings(
       (make_embedding): Sequential(
@@ -287,41 +293,41 @@ with just AbstractMethods for the control group, then this should be False. Defa
     (2): LogSoftmax(dim=-1)
   )
 )
-[2021-04-09 08:33:23,956 INFO] encoder: 4214500
-[2021-04-09 08:33:23,956 INFO] decoder: 6165407
-[2021-04-09 08:33:23,956 INFO] * number of parameters: 10379907
-[2021-04-09 08:33:23,961 INFO] Starting training on CPU, could be very slow
-[2021-04-09 08:33:23,961 INFO] Start training loop and validate every 100 steps...
-[2021-04-09 08:33:23,961 INFO] corpus_1&#39;s transforms: TransformPipe()
-[2021-04-09 08:33:23,971 INFO] Loading ParallelCorpus(../data/small/train_buggy.txt, ../data/small/train_fixed.txt, align=None)...
-[2021-04-09 08:36:18,870 INFO] Step 50/  500; acc:  11.31; ppl: 1907.46; xent: 7.55; lr: 1.00000; 566/539 tok/s;    175 sec
-[2021-04-09 08:39:03,209 INFO] Step 100/  500; acc:  21.93; ppl: 76.95; xent: 4.34; lr: 1.00000; 628/588 tok/s;    339 sec
-[2021-04-09 08:39:03,210 INFO] valid&#39;s transforms: TransformPipe()
-[2021-04-09 08:39:03,215 INFO] Loading ParallelCorpus(../data/small/valid_buggy.txt, ../data/small/valid_fixed.txt, align=None)...
-[2021-04-09 08:40:51,307 INFO] Validation perplexity: 33.7895
-[2021-04-09 08:40:51,307 INFO] Validation accuracy: 23.6846
-[2021-04-09 08:43:34,191 INFO] Step 150/  500; acc:  35.69; ppl: 20.05; xent: 3.00; lr: 1.00000; 374/354 tok/s;    610 sec
-[2021-04-09 08:46:13,830 INFO] Step 200/  500; acc:  44.62; ppl: 11.19; xent: 2.42; lr: 1.00000; 627/597 tok/s;    770 sec
-[2021-04-09 08:46:13,835 INFO] Loading ParallelCorpus(../data/small/valid_buggy.txt, ../data/small/valid_fixed.txt, align=None)...
-[2021-04-09 08:47:59,314 INFO] Validation perplexity: 7.99917
-[2021-04-09 08:47:59,314 INFO] Validation accuracy: 49.9935
-[2021-04-09 08:50:38,974 INFO] Step 250/  500; acc:  48.57; ppl:  9.14; xent: 2.21; lr: 1.00000; 383/361 tok/s;   1035 sec
-[2021-04-09 08:50:38,979 INFO] Saving checkpoint test_model/model_step_250.pt
-[2021-04-09 08:53:24,451 INFO] Step 300/  500; acc:  52.27; ppl:  7.33; xent: 1.99; lr: 1.00000; 612/583 tok/s;   1200 sec
-[2021-04-09 08:53:24,458 INFO] Loading ParallelCorpus(../data/small/valid_buggy.txt, ../data/small/valid_fixed.txt, align=None)...
-[2021-04-09 08:55:12,916 INFO] Validation perplexity: 6.6979
-[2021-04-09 08:55:12,916 INFO] Validation accuracy: 50.5736
-[2021-04-09 08:58:03,530 INFO] Step 350/  500; acc:  54.84; ppl:  6.41; xent: 1.86; lr: 1.00000; 373/349 tok/s;   1480 sec
-[2021-04-09 09:01:00,685 INFO] Step 400/  500; acc:  56.51; ppl:  5.91; xent: 1.78; lr: 1.00000; 570/541 tok/s;   1657 sec
-[2021-04-09 09:01:00,691 INFO] Loading ParallelCorpus(../data/small/valid_buggy.txt, ../data/small/valid_fixed.txt, align=None)...
-[2021-04-09 09:02:51,454 INFO] Validation perplexity: 4.954
-[2021-04-09 09:02:51,454 INFO] Validation accuracy: 61.0846
-[2021-04-09 09:05:54,403 INFO] Step 450/  500; acc:  58.99; ppl:  5.24; xent: 1.66; lr: 1.00000; 346/325 tok/s;   1950 sec
-[2021-04-09 09:08:57,865 INFO] Step 500/  500; acc:  59.61; ppl:  5.06; xent: 1.62; lr: 1.00000; 556/524 tok/s;   2134 sec
-[2021-04-09 09:08:57,870 INFO] Loading ParallelCorpus(../data/small/valid_buggy.txt, ../data/small/valid_fixed.txt, align=None)...
-[2021-04-09 09:10:47,276 INFO] Validation perplexity: 4.40575
-[2021-04-09 09:10:47,276 INFO] Validation accuracy: 61.2692
-[2021-04-09 09:10:47,283 INFO] Saving checkpoint test_model/model_step_500.pt
+[2021-04-09 15:43:06,694 INFO] encoder: 4214500
+[2021-04-09 15:43:06,694 INFO] decoder: 6165407
+[2021-04-09 15:43:06,694 INFO] * number of parameters: 10379907
+[2021-04-09 15:43:06,707 INFO] Starting training on CPU, could be very slow
+[2021-04-09 15:43:06,707 INFO] Start training loop and validate every 100 steps...
+[2021-04-09 15:43:06,707 INFO] corpus_1&#39;s transforms: TransformPipe()
+[2021-04-09 15:43:06,724 INFO] Loading ParallelCorpus(../data/small/train_buggy.txt, ../data/small/train_fixed.txt, align=None)...
+[2021-04-09 15:45:35,130 INFO] Step 50/  500; acc:  11.79; ppl: 1690.73; xent: 7.43; lr: 1.00000; 674/637 tok/s;    148 sec
+[2021-04-09 15:47:57,354 INFO] Step 100/  500; acc:  12.99; ppl: 783.34; xent: 6.66; lr: 1.00000; 719/678 tok/s;    291 sec
+[2021-04-09 15:47:57,354 INFO] valid&#39;s transforms: TransformPipe()
+[2021-04-09 15:47:57,358 INFO] Loading ParallelCorpus(../data/small/valid_buggy.txt, ../data/small/valid_fixed.txt, align=None)...
+[2021-04-09 15:49:32,115 INFO] Validation perplexity: 62.9022
+[2021-04-09 15:49:32,115 INFO] Validation accuracy: 9.56364
+[2021-04-09 15:51:51,474 INFO] Step 150/  500; acc:  19.41; ppl: 63.30; xent: 4.15; lr: 1.00000; 426/406 tok/s;    525 sec
+[2021-04-09 15:54:10,095 INFO] Step 200/  500; acc:  33.56; ppl: 21.54; xent: 3.07; lr: 1.00000; 733/693 tok/s;    663 sec
+[2021-04-09 15:54:10,098 INFO] Loading ParallelCorpus(../data/small/valid_buggy.txt, ../data/small/valid_fixed.txt, align=None)...
+[2021-04-09 15:55:43,957 INFO] Validation perplexity: 14.0887
+[2021-04-09 15:55:43,958 INFO] Validation accuracy: 40.9356
+[2021-04-09 15:58:05,429 INFO] Step 250/  500; acc:  43.34; ppl: 12.01; xent: 2.49; lr: 1.00000; 434/408 tok/s;    899 sec
+[2021-04-09 15:58:05,433 INFO] Saving checkpoint test_model/model_step_250.pt
+[2021-04-09 16:00:35,173 INFO] Step 300/  500; acc:  47.41; ppl:  9.06; xent: 2.20; lr: 1.00000; 674/642 tok/s;   1048 sec
+[2021-04-09 16:00:35,177 INFO] Loading ParallelCorpus(../data/small/valid_buggy.txt, ../data/small/valid_fixed.txt, align=None)...
+[2021-04-09 16:02:14,999 INFO] Validation perplexity: 11.6772
+[2021-04-09 16:02:14,999 INFO] Validation accuracy: 44.911
+[2021-04-09 16:04:50,386 INFO] Step 350/  500; acc:  51.08; ppl:  7.66; xent: 2.04; lr: 1.00000; 415/388 tok/s;   1304 sec
+[2021-04-09 16:07:20,581 INFO] Step 400/  500; acc:  54.68; ppl:  6.53; xent: 1.88; lr: 1.00000; 660/624 tok/s;   1454 sec
+[2021-04-09 16:07:20,585 INFO] Loading ParallelCorpus(../data/small/valid_buggy.txt, ../data/small/valid_fixed.txt, align=None)...
+[2021-04-09 16:08:54,989 INFO] Validation perplexity: 6.27018
+[2021-04-09 16:08:54,989 INFO] Validation accuracy: 59.0065
+[2021-04-09 16:11:28,483 INFO] Step 450/  500; acc:  56.07; ppl:  5.92; xent: 1.78; lr: 1.00000; 417/392 tok/s;   1702 sec
+[2021-04-09 16:13:59,300 INFO] Step 500/  500; acc:  57.93; ppl:  5.42; xent: 1.69; lr: 1.00000; 659/626 tok/s;   1853 sec
+[2021-04-09 16:13:59,304 INFO] Loading ParallelCorpus(../data/small/valid_buggy.txt, ../data/small/valid_fixed.txt, align=None)...
+[2021-04-09 16:15:53,970 INFO] Validation perplexity: 4.64709
+[2021-04-09 16:15:53,970 INFO] Validation accuracy: 63.2672
+[2021-04-09 16:15:53,975 INFO] Saving checkpoint test_model/model_step_500.pt
 </pre>
 </div>
 </div>
@@ -374,7 +380,7 @@ with just AbstractMethods for the control group, then this should be False. Defa
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fixedMethod</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">buggyMethod</span><span class="p">,</span> <span class="n">modelFile</span> <span class="o">=</span> <span class="s2">&quot;test_model/model_step_250.pt&quot;</span><span class="p">,</span> <span class="n">applyEditOperations</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fixedMethod</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">buggyMethod</span><span class="p">,</span> <span class="n">applyEditOperations</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
 <span class="n">fixedMethod</span>
 </pre></div>
 
@@ -388,8 +394,8 @@ with just AbstractMethods for the control group, then this should be False. Defa
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[2021-04-09 09:20:31,950 INFO] Translating shard 0.
-[2021-04-09 09:20:32,076 INFO] PRED AVG SCORE: -0.5723, PRED PPL: 1.7724
+<pre>[2021-04-09 16:21:10,149 INFO] Translating shard 0.
+[2021-04-09 16:21:10,276 INFO] PRED AVG SCORE: -0.5357, PRED PPL: 1.7087
 </pre>
 </div>
 </div>
@@ -399,7 +405,7 @@ with just AbstractMethods for the control group, then this should be False. Defa
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>private void METHOD_1 ( java.lang.String VAR_1 ) { return VAR_1 ; }</pre>
+<pre>private TYPE_1 METHOD_1 ( ) { return VAR_1 . METHOD_2 ( ) ) ; }</pre>
 </div>
 
 </div>

@@ -307,4 +307,5 @@ class CompoundOperation:
 
 # Cell
 #hide
+# define for a second time here so that CompoundOperation no longer has to be a forward declaration
 EditOperation = Union[InsertOperation, DeleteOperation, ReplaceOperation, CompoundOperation]
