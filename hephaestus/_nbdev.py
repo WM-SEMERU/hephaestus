@@ -6,10 +6,22 @@ index = {"InsertOperation": "00_EditOperations.ipynb",
          "DeleteOperation": "00_EditOperations.ipynb",
          "ReplaceOperation": "00_EditOperations.ipynb",
          "EditOperation": "00_EditOperations.ipynb",
-         "AbstractMethod": "01_AbstractMethod.ipynb"}
+         "CompoundOperation": "00_EditOperations.ipynb",
+         "getCondensedBasic": "01_CondenseEditOperations.ipynb",
+         "getCondensedLoose": "01_CondenseEditOperations.ipynb",
+         "getCondensedStrict": "01_CondenseEditOperations.ipynb",
+         "AbstractMethod": "02_AbstractMethod.ipynb",
+         "readAbstractMethodsFromFile": "03_IOUtils.ipynb",
+         "writeAbstractMethodsToFile": "03_IOUtils.ipynb",
+         "getYamlParameter": "03_IOUtils.ipynb",
+         "runCommand": "03_IOUtils.ipynb",
+         "HephaestusModel": "04_HephaestusModel.ipynb"}
 
 modules = ["EditOperations.py",
-           "AbstractMethod.py"]
+           "CondenseEditOperations.py",
+           "AbstractMethod.py",
+           "IOUtils.py",
+           "HephaestusModel.py"]
 
 doc_url = "https://WM-SEMERU.github.io/hephaestus/"
 

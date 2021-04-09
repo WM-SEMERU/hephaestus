@@ -2,6 +2,9 @@
   "hephaestus": {
     "Overview": "/",
     "EditOperations": "EditOperations.html",
-    "AbstractMethod": "AbstractMethod.html"
+    "CondenseEditOperations": "CondenseEditOperations.html",
+    "AbstractMethod": "AbstractMethod.html",
+    "IOUtils": "IOUtils.html",
+    "HephaestusModel": "HephaestusModel.html"
   }
 }

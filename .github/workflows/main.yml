@@ -9,9 +9,9 @@ jobs:
       with:
         python-version: '3.6'
         architecture: 'x64'
-    - name: Install the library
+    - name: Install necessary libraries
       run: |
-        pip install nbdev jupyter
+        pip install nbdev jupyter OpenNMT-py>=2.0.0
         pip install -e .
     - name: Read all notebooks
       run: |

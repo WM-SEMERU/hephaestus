@@ -13,8 +13,17 @@ entries:
       title: EditOperations
       url: EditOperations.html
     - output: web,pdf
+      title: CondenseEditOperations
+      url: CondenseEditOperations.html
+    - output: web,pdf
       title: AbstractMethod
       url: AbstractMethod.html
+    - output: web,pdf
+      title: IOUtils
+      url: IOUtils.html
+    - output: web,pdf
+      title: HephaestusModel
+      url: HephaestusModel.html
     output: web
     title: hephaestus
   output: web

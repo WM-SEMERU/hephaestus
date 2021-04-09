@@ -1,7 +1,7 @@
 repository: WM-SEMERU/{lib_name}
 output: web
-topnav_title: {lib_name}
-site_title: {lib_name}
+topnav_title: {Hephaestus}
+site_title: {Hephaestus}
 company_name: Put your copyright information here
 description: A description of your project
 # Set to false to disable KaTeX math
