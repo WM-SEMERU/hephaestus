@@ -4,7 +4,7 @@ __all__ = ['HephaestusModel']
 
 # Cell
 #hide
-from typing import Union, List, Literal, Optional, Tuple
+from typing import Union, List, Optional, Tuple
 import os
 import subprocess
 import re
@@ -105,7 +105,7 @@ class HephaestusModel:
                 trainSteps = trainSteps, validSteps = validSteps, saveCheckpointSteps = saveCheckpointSteps)
 
         # build vocabulary
-        runCommand(["onmt_build_vocab -config '{}' -n_sample {}".format(self.__CONFIG_PATH, vocabSamples)])
+        runCommand('onmt_build_vocab -config "{}" -n_sample {}'.format(self.__CONFIG_PATH, vocabSamples))
 
         # delete previous model files
         for file in os.listdir(self.__MODEL_DIR):
@@ -113,7 +113,7 @@ class HephaestusModel:
                 os.remove(os.path.join(self.__MODEL_DIR, file))
 
         # train the model
-        runCommand(["onmt_train -config '{}'".format(self.__CONFIG_PATH)])
+        runCommand('onmt_train -config "{}"'.format(self.__CONFIG_PATH))
 
         # find and release the highest trained model
         latestModel = None
@@ -127,7 +127,7 @@ class HephaestusModel:
                     maxNum = stepNum
 
         if latestModel is not None:
-            runCommand(["onmt_release_model --model '{}' --output '{}'".format(latestModel, self.__FINAL_MODEL_PATH)])
+            runCommand('onmt_release_model --model "{}" --output "{}"'.format(latestModel, self.__FINAL_MODEL_PATH))
 
     def translate(self,
         buggy: Union[str, AbstractMethod, List[AbstractMethod]],
@@ -170,9 +170,9 @@ class HephaestusModel:
             buggyFile = buggy
 
         # translate the buggy methods
-        command = ["onmt_translate -model '{}' -src '{}' -output '{}'".format(modelFile, buggyFile, self.__OUTPUT_PATH)]
+        command = 'onmt_translate -model "{}" -src "{}" -output "{}"'.format(modelFile, buggyFile, self.__OUTPUT_PATH)
         if getYamlParameter(self.__CONFIG_PATH, "world_size") is not None: # if GPU should be used
-            command += ["-gpu", "0"]
+            command += "-gpu 0"
         runCommand(command)
 
         # get all inputted AbstractMethods
