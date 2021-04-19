@@ -7,6 +7,8 @@ __all__ = ['InsertOperation', 'DeleteOperation', 'ReplaceOperation', 'EditOperat
 #hide
 from typing import List, Union, Tuple, Type
 
+import re
+
 # Cell
 class InsertOperation:
     """
@@ -17,6 +19,13 @@ class InsertOperation:
     def __init__(self, tokenIndex: int, newToken: str) -> None:
         self.__tokenIndex = tokenIndex
         self.__newToken = newToken
+
+    def __eq__(self, other: "InsertOperation") -> bool:
+        return (
+            type(other) is InsertOperation and
+            self.__tokenIndex == other.__tokenIndex and
+            self.__newToken == other.__newToken
+        )
 
     def __str__(self) -> str:
         return "INSERT {} -> '{}'".format(self.__tokenIndex, self.__newToken)
@@ -56,6 +65,12 @@ class DeleteOperation:
     def __init__(self, tokenIndex: int) -> None:
         self.__tokenIndex = tokenIndex
 
+    def __eq__(self, other: "DeleteOperation") -> bool:
+        return (
+            type(other) is DeleteOperation and
+            self.__tokenIndex == other.__tokenIndex
+        )
+
     def __str__(self) -> str:
         return "DELETE {}".format(self.__tokenIndex)
 
@@ -94,6 +109,13 @@ class ReplaceOperation:
     def __init__(self, tokenIndex: int, newToken: str) -> None:
         self.__tokenIndex = tokenIndex
         self.__newToken = newToken
+
+    def __eq__(self, other: "ReplaceOperation") -> bool:
+        return (
+            type(other) is ReplaceOperation and
+            self.__tokenIndex == other.__tokenIndex and
+            self.__newToken == other.__newToken
+        )
 
     def __str__(self) -> str:
         return "REPLACE {} -> '{}'".format(self.__tokenIndex, self.__newToken)
@@ -165,6 +187,65 @@ class CompoundOperation:
         # set the type
         self.__type = None
         self.__setType()
+
+    def FromMachineString(string: str) -> "CompoundOperation":
+        """
+        Returns a `CompoundOperation` which represents the given machine string such that the following equality holds:
+        `operation == CompoundOperation.FromMachineString(operation.getMachineString())`
+        """
+
+        # first, attempt to parse the input machine string
+        match = re.search(r"^<op> (\d+) (\d+) <sep>( (?:[^ ]+ )*)</op>$", string)
+        if not match:
+            raise ValueError("CompoundOperation: invalid machine string: '{}'".format(string))
+
+        # get compound operation attributes from match results
+        beginIndex = int(match.group(1))
+        endIndex = int(match.group(2))
+        newTokens = match.group(3).strip().split(" ")
+        if newTokens == [""]:
+            newTokens = []
+
+        # make sure endIndex is at least beginIndex
+        if not endIndex >= beginIndex:
+            raise ValueError("CompoundOperation: invalid machine string: '{}'".format(string))
+
+        # build the compound operation, start with an "empty" operation with no deletions or insertions
+        operation = CompoundOperation(InsertOperation(beginIndex, "<placeholder>"))
+        operation.addLoose(DeleteOperation(beginIndex))
+        operation.__beginIndex = beginIndex
+        operation.__endIndex = endIndex
+        operation.__newTokens = newTokens
+        operation.__setType()
+
+        return operation
+
+    def getMachineString(self) -> str:
+        """
+        Returns a string formatted for use in training a machine learning model, i.e. a `HephaestusModel`. The format is
+        as follows:
+
+        `<op> beginIndex endIndex <sep> tokens </op>`
+
+        The range `beginIndex:endIndex` refers to the pythonic range of tokens which the `CompoundOperation` deletes.
+        Thus, if `beginIndex` and `endIndex` are equal, then no tokens are deleted. `tokens` refers to the list of tokens
+        which are added at `beginIndex` once the aformentioned range is deleted.
+
+        Note: this method is different from the `__str__()` method, which returns a more human-readable string.
+        """
+        return "<op> {} {} <sep>{}</op>".format(
+            self.__beginIndex,
+            self.__endIndex,
+            " " if len(self.__newTokens) == 0 else " " + " ".join(self.__newTokens) + " "
+        )
+
+    def __eq__(self, other: "CompoundOperation") -> bool:
+        # don't have to check __type attribute, because it is a function of the index range and tokens
+        return (
+            type(other) is CompoundOperation and
+            self.getIndexRange() == other.getIndexRange() and
+            self.__newTokens == other.__newTokens
+        )
 
     def __str__(self) -> str:
 

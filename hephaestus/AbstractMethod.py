@@ -60,6 +60,12 @@ class AbstractMethod:
         for op in operations:
             self.applyEditOperation(op)
 
+    def getEditDistanceTo(self, other: "AbstractMethod") -> int:
+        """
+        Returns the Levenshtein edit distance to the `AbstractMethod` given by `other`.
+        """
+        return self.__getEditOpsMatrix(other)[-1][-1]
+
     def getEditOperationsTo(self, other: "AbstractMethod") -> List[Union[InsertOperation, DeleteOperation, ReplaceOperation]]:
         """
         Returns the minimal list of basic edit operations (no CompoundOperations), which if applied, would

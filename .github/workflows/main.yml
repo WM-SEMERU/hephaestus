@@ -29,5 +29,10 @@ jobs:
       run: |
         if [ -n "$(nbdev_diff_nbs)" ]; then echo -e "!!! Detected difference between the notebooks and the library"; false; fi
     - name: Run tests
+    # run all notebooks except 05_HephaestusModel, because the cell that trains the model will time out
       run: |
-        nbdev_test_nbs
+        nbdev_test_nbs --fname nbs/00_EditOperations.ipynb
+        nbdev_test_nbs --fname nbs/01_CondenseEditOperations.ipynb
+        nbdev_test_nbs --fname nbs/02_AbstractMethod.ipynb
+        nbdev_test_nbs --fname nbs/03_IOUtils.ipynb
+        nbdev_test_nbs --fname nbs/04_DatasetConstruction.ipynb

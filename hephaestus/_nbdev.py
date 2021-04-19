@@ -13,14 +13,18 @@ index = {"InsertOperation": "00_EditOperations.ipynb",
          "AbstractMethod": "02_AbstractMethod.ipynb",
          "readAbstractMethodsFromFile": "03_IOUtils.ipynb",
          "writeAbstractMethodsToFile": "03_IOUtils.ipynb",
+         "readCompoundOperationsFromFile": "03_IOUtils.ipynb",
+         "writeCompoundOperationsToFile": "03_IOUtils.ipynb",
          "getYamlParameter": "03_IOUtils.ipynb",
          "runCommand": "03_IOUtils.ipynb",
-         "HephaestusModel": "04_HephaestusModel.ipynb"}
+         "makeEditOpsFile": "04_DatasetConstruction.ipynb",
+         "HephaestusModel": "05_HephaestusModel.ipynb"}
 
 modules = ["EditOperations.py",
            "CondenseEditOperations.py",
            "AbstractMethod.py",
            "IOUtils.py",
+           "DatasetConstruction.py",
            "HephaestusModel.py"]
 
 doc_url = "https://WM-SEMERU.github.io/hephaestus/"

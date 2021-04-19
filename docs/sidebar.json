@@ -5,6 +5,7 @@
     "CondenseEditOperations": "CondenseEditOperations.html",
     "AbstractMethod": "AbstractMethod.html",
     "IOUtils": "IOUtils.html",
+    "DatasetConstruction": "DatasetConstruction.html",
     "HephaestusModel": "HephaestusModel.html"
   }
 }

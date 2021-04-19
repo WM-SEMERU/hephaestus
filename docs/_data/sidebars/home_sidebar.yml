@@ -22,6 +22,9 @@ entries:
       title: IOUtils
       url: IOUtils.html
     - output: web,pdf
+      title: DatasetConstruction
+      url: DatasetConstruction.html
+    - output: web,pdf
       title: HephaestusModel
       url: HephaestusModel.html
     output: web
