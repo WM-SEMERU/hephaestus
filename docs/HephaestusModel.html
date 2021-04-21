@@ -80,35 +80,52 @@ will attempt to create it.</li>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="HephaestusModel.train" class="doc_header"><code>HephaestusModel.train</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/HephaestusModel.py#L52" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>HephaestusModel.train</code>(<strong><code>trainSource</code></strong>:<code>str</code>, <strong><code>trainTarget</code></strong>:<code>str</code>, <strong><code>validSource</code></strong>:<code>str</code>, <strong><code>validTarget</code></strong>:<code>str</code>, <strong><code>vocabSamples</code></strong>:<code>int</code>=<em><code>10000</code></em>, <strong><code>numGPUs</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>trainSteps</code></strong>:<code>int</code>=<em><code>1000</code></em>, <strong><code>validSteps</code></strong>:<code>int</code>=<em><code>None</code></em>, <strong><code>saveCheckpointSteps</code></strong>:<code>int</code>=<em><code>None</code></em>)</p>
+<h4 id="HephaestusModel.train" class="doc_header"><code>HephaestusModel.train</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/HephaestusModel.py#L52" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>HephaestusModel.train</code>(<strong><code>trainSource</code></strong>:<code>str</code>, <strong><code>trainTarget</code></strong>:<code>str</code>, <strong><code>validSource</code></strong>:<code>str</code>, <strong><code>validTarget</code></strong>:<code>str</code>, <strong><code>numCheckpoints</code></strong>:<code>int</code>=<em><code>10</code></em>, <strong><code>numGPUs</code></strong>:<code>int</code>=<em><code>1</code></em>, <strong><code>embeddingSize</code></strong>:<code>int</code>=<em><code>512</code></em>, <strong><code>rnnType</code></strong>:<code>str</code>=<em><code>'LSTM'</code></em>, <strong><code>rnnSize</code></strong>:<code>int</code>=<em><code>256</code></em>, <strong><code>numLayers</code></strong>:<code>int</code>=<em><code>2</code></em>, <strong><code>numTrainingSteps</code></strong>:<code>int</code>=<em><code>50000</code></em>, <strong><code>numValidations</code></strong>:<code>int</code>=<em><code>10</code></em>, <strong><code>dropout</code></strong>:<code>int</code>=<em><code>0.2</code></em>)</p>
 </blockquote>
 <p>Trains the model with the given parameters. Files containing AbstractMethods should have one per line with
 tokens separated by spaces. 'source' files must contain AbstractMethods. 'target' files may contain
-AbstractMethods or CompoundOperations.</p>
+AbstractMethods or CompoundOperations in machine string format.</p>
 <p>As the training progesses, checkpoint model files are created which follow the format <code>model_step_#.pt</code>, where
 <code>#</code> corresponds to the training step number. Once training is complete, the finalized model is outputted to
 <code>model_final.pt</code>.</p>
-<p>Required args:</p>
+<p>Default parameter values are such that they resemble the most successful NMT model in
+<a href="https://arxiv.org/pdf/1812.08693.pdf">this paper</a> as closely as possible.</p>
+<p>Parameters:</p>
 <ul>
-<li><code>trainSource</code>: File name contatining training source data, must be buggy AbstractMethods.</li>
-<li><code>trainTarget</code>: File name contatining training target data, can be fixed AbstractMethods or CompoundOperations
-describing buggy -&gt; fixed.</li>
-<li><code>validSource</code>: File name contatining validation source data, must be buggy AbstractMethods.</li>
-<li><code>validTarget</code>: File name contatining validation target data, must be the same type of data provided in
-<code>trainTarget</code>.</li>
+<li>Data and vocabulary:<ul>
+<li><code>trainSource</code>: Required. File name containing training source data. Must be buggy AbstractMethods.</li>
+<li><code>trainTarget</code>: Required. File name containing training target data. Can be either non-buggy
+AbstractMethods or CompoundOperations in machine string format.</li>
+<li><code>validSource</code>: Required. File name containing validation source data. Must be buggy AbstractMethods.</li>
+<li><code>validTarget</code>: Required. File name containing validation target data. Must be the same type of data which
+is contained in the file denoted by <code>trainTarget</code>.</li>
 </ul>
-<p>Optional args:</p>
-<ul>
-<li><code>vocabSamples</code>: Number of transformed samples per corpus to use when building vocabulary. Defaults to 10000.</li>
-<li><code>numGPUs</code>: Number of GPUs to use concurrently during training. If set to 0, then the CPU is used. Defaults to
-1.</li>
-<li><code>trainSteps</code>: Number of training steps to go through. Defaults to 1000.</li>
-<li><code>validSteps</code>: Number of training steps after which each validation occurs; e.g. if <code>trainSteps</code> is 1000 and
-<code>validSteps</code> is 500, then validation will occur after training steps 500 and 1000. Defaults to
-<code>trainSteps</code> / 2.</li>
-<li><code>saveCheckpointSteps</code>: Number of training steps after which model checkpoints are saved; e.g. if <code>trainSteps</code>
-is 1000 and 'saveCheckpointSteps' is 500, then the model will be saved in after training steps 5000 and 1000.
-Defaults to <code>trainSteps</code> / 2.</li>
+</li>
+<li>General options:<ul>
+<li><code>numCheckpoints</code>: Number of times a checkpoint model is saved; e.g. if <code>numTrainingSteps</code> is 50,000 and
+<code>numCheckpoints</code> is 10, then a checkpoint will be saved after every 5,000 training steps. Defaults to 10.</li>
+<li><code>numGPUs</code>: Number of GPUs to use concurrently during training. If set to 0, then the CPU is used. Defaults
+to 1.</li>
+</ul>
+</li>
+<li>Model options:<ul>
+<li><code>embeddingSize</code>: Word embedding size for source and target. Defaults to 512.</li>
+</ul>
+</li>
+<li>Encoder/decoder options:<ul>
+<li><code>rnnType</code>: Gate type to use in RNN encoder and decoder. Can be <code>"LSTM"</code> or <code>"GRU"</code>. Defaults to <code>"LSTM"</code>.</li>
+<li><code>rnnSize</code>: Size of encoder and decoder RNN hidden states. Defaults to 256.</li>
+<li><code>numLayers</code>: Number of layers each in the encoder and decoder. Defaults to 2.</li>
+</ul>
+</li>
+<li>Learning options:<ul>
+<li><code>numTrainingSteps</code>: Number of training steps to perform. Defaults to 50,000.</li>
+<li><code>numValidations</code>: <code>validSteps</code>: Number of validations to perform during training; e.g. if <code>numTrainingSteps</code>
+is 50,000 and <code>numValidations</code> is 10, then validation will occur after every 5,000 training steps. Defaults to
+10.</li>
+<li><code>dropout</code>: Dropout probability. Defaults to 0.2.</li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -132,7 +149,7 @@ Defaults to <code>trainSteps</code> / 2.</li>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="HephaestusModel.translate" class="doc_header"><code>HephaestusModel.translate</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/HephaestusModel.py#L135" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>HephaestusModel.translate</code>(<strong><code>buggy</code></strong>:<code>Union</code>[<code>str</code>, <a href="/hephaestus/AbstractMethod.html"><code>AbstractMethod</code></a>, <code>List</code>[<a href="/hephaestus/AbstractMethod.html"><code>AbstractMethod</code></a>]], <strong><code>modelFile</code></strong>:<code>str</code>=<em><code>None</code></em>, <strong><code>applyEditOperations</code></strong>:<code>bool</code>=<em><code>True</code></em>)</p>
+<h4 id="HephaestusModel.translate" class="doc_header"><code>HephaestusModel.translate</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/HephaestusModel.py#L142" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>HephaestusModel.translate</code>(<strong><code>buggy</code></strong>:<code>Union</code>[<code>str</code>, <a href="/hephaestus/AbstractMethod.html"><code>AbstractMethod</code></a>, <code>List</code>[<a href="/hephaestus/AbstractMethod.html"><code>AbstractMethod</code></a>]], <strong><code>modelFile</code></strong>:<code>str</code>=<em><code>None</code></em>, <strong><code>applyEditOperations</code></strong>:<code>bool</code>=<em><code>True</code></em>)</p>
 </blockquote>
 <p>Translates the given <code>buggy</code> AbstractMethods into supposedly fixed AbstractMethods, writes them to
 <code>&lt;model_directory&gt;/postprocessed_output.txt</code>, and then returns them. The raw output of the model is written
@@ -210,7 +227,7 @@ the control group, then this should be False. Defaults to True.</li>
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Now there is a directory called <code>test_model_loose</code> which will be populated with files once the model is trained. It's time to train the model with the loosely condensed edit operations dataset. Since this is just an example, a <em>very</em> small number of training steps will be used.</p>
+<p>Now there is a directory called <code>test_model_loose</code> which will be populated with files once the model is trained. We will train the model with the loosely condensed edit operations dataset. Since this is just an example, a <em>very</em> small number of training steps will be used.</p>
 
 </div>
 </div>
@@ -227,10 +244,10 @@ the control group, then this should be False. Defaults to True.</li>
     <span class="s2">&quot;../data/edit_ops/loose/small/train.txt&quot;</span><span class="p">,</span>
     <span class="s2">&quot;../data/abstract_methods/small/valid_buggy.txt&quot;</span><span class="p">,</span>
     <span class="s2">&quot;../data/edit_ops/loose/small/valid.txt&quot;</span><span class="p">,</span>
+    <span class="n">numCheckpoints</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
     <span class="n">numGPUs</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="n">trainSteps</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
-    <span class="n">validSteps</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
-    <span class="n">saveCheckpointSteps</span> <span class="o">=</span> <span class="mi">250</span>
+    <span class="n">numTrainingSteps</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
+    <span class="n">numValidations</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="p">)</span>
 </pre></div>
 
@@ -247,97 +264,104 @@ the control group, then this should be False. Defaults to True.</li>
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[2021-04-19 05:48:46,172 INFO] Counter vocab from 10000 samples.
-[2021-04-19 05:48:46,172 INFO] Build vocab on 10000 transformed examples/corpus.
-[2021-04-19 05:48:48,403 INFO] Counters src:411
-[2021-04-19 05:48:48,403 INFO] Counters tgt:405
-[2021-04-19 05:48:50,852 WARNING] You have a CUDA device, should run with -gpu_ranks
-[2021-04-19 05:48:50,854 INFO] Parsed 2 corpora from -data.
-[2021-04-19 05:48:50,855 INFO] Get special vocabs from Transforms: {&#39;src&#39;: set(), &#39;tgt&#39;: set()}.
-[2021-04-19 05:48:50,855 INFO] Loading vocab from text file...
-[2021-04-19 05:48:50,855 INFO] Loading src vocabulary from test_model_loose/save_data.vocab.src
-[2021-04-19 05:48:50,882 INFO] Loaded src vocab has 411 tokens.
-[2021-04-19 05:48:50,883 INFO] Loading tgt vocabulary from test_model_loose/save_data.vocab.tgt
-[2021-04-19 05:48:50,902 INFO] Loaded tgt vocab has 405 tokens.
-[2021-04-19 05:48:50,902 INFO] Building fields with vocab in counters...
-[2021-04-19 05:48:50,904 INFO]  * tgt vocab size: 409.
-[2021-04-19 05:48:50,905 INFO]  * src vocab size: 413.
-[2021-04-19 05:48:50,907 INFO]  * src vocab size = 413
-[2021-04-19 05:48:50,908 INFO]  * tgt vocab size = 409
-[2021-04-19 05:48:50,909 INFO] Building model...
-[2021-04-19 05:48:51,166 INFO] NMTModel(
+<pre>[2021-04-21 05:14:33,800 INFO] Counter vocab from -1 samples.
+[2021-04-21 05:14:33,800 INFO] n_sample=-1: Build vocab on full datasets.
+[2021-04-21 05:14:36,601 INFO] Counters src:429
+[2021-04-21 05:14:36,601 INFO] Counters tgt:444
+[2021-04-21 05:14:36,601 WARNING] path test_model_loose/save_data.vocab.src exists, may overwrite...
+[2021-04-21 05:14:36,609 WARNING] path test_model_loose/save_data.vocab.tgt exists, may overwrite...
+[2021-04-21 05:14:39,559 WARNING] You have a CUDA device, should run with -gpu_ranks
+[2021-04-21 05:14:39,584 INFO] Parsed 2 corpora from -data.
+[2021-04-21 05:14:39,592 INFO] Get special vocabs from Transforms: {&#39;src&#39;: set(), &#39;tgt&#39;: set()}.
+[2021-04-21 05:14:39,592 INFO] Loading vocab from text file...
+[2021-04-21 05:14:39,592 INFO] Loading src vocabulary from test_model_loose/save_data.vocab.src
+[2021-04-21 05:14:39,625 INFO] Loaded src vocab has 429 tokens.
+[2021-04-21 05:14:39,625 INFO] Loading tgt vocabulary from test_model_loose/save_data.vocab.tgt
+[2021-04-21 05:14:39,675 INFO] Loaded tgt vocab has 444 tokens.
+[2021-04-21 05:14:39,675 INFO] Building fields with vocab in counters...
+[2021-04-21 05:14:39,683 INFO]  * tgt vocab size: 448.
+[2021-04-21 05:14:39,691 INFO]  * src vocab size: 431.
+[2021-04-21 05:14:39,691 INFO]  * src vocab size = 431
+[2021-04-21 05:14:39,691 INFO]  * tgt vocab size = 448
+[2021-04-21 05:14:39,691 INFO] Building model...
+[2021-04-21 05:14:39,844 INFO] NMTModel(
   (encoder): RNNEncoder(
     (embeddings): Embeddings(
       (make_embedding): Sequential(
         (emb_luts): Elementwise(
-          (0): Embedding(413, 500, padding_idx=1)
+          (0): Embedding(431, 512, padding_idx=1)
         )
       )
     )
-    (rnn): LSTM(500, 500, num_layers=2, dropout=0.3)
+    (rnn): LSTM(512, 256, num_layers=2, dropout=0.2)
   )
   (decoder): InputFeedRNNDecoder(
     (embeddings): Embeddings(
       (make_embedding): Sequential(
         (emb_luts): Elementwise(
-          (0): Embedding(409, 500, padding_idx=1)
+          (0): Embedding(448, 512, padding_idx=1)
         )
       )
     )
-    (dropout): Dropout(p=0.3, inplace=False)
+    (dropout): Dropout(p=0.2, inplace=False)
     (rnn): StackedLSTM(
-      (dropout): Dropout(p=0.3, inplace=False)
+      (dropout): Dropout(p=0.2, inplace=False)
       (layers): ModuleList(
-        (0): LSTMCell(1000, 500)
-        (1): LSTMCell(500, 500)
+        (0): LSTMCell(768, 256)
+        (1): LSTMCell(256, 256)
       )
     )
     (attn): GlobalAttention(
-      (linear_in): Linear(in_features=500, out_features=500, bias=False)
-      (linear_out): Linear(in_features=1000, out_features=500, bias=False)
+      (linear_context): Linear(in_features=256, out_features=256, bias=False)
+      (linear_query): Linear(in_features=256, out_features=256, bias=True)
+      (v): Linear(in_features=256, out_features=1, bias=False)
+      (linear_out): Linear(in_features=512, out_features=256, bias=True)
     )
   )
   (generator): Sequential(
-    (0): Linear(in_features=500, out_features=409, bias=True)
+    (0): Linear(in_features=256, out_features=448, bias=True)
     (1): Cast()
     (2): LogSoftmax(dim=-1)
   )
 )
-[2021-04-19 05:48:51,167 INFO] encoder: 4214500
-[2021-04-19 05:48:51,168 INFO] decoder: 6167409
-[2021-04-19 05:48:51,168 INFO] * number of parameters: 10381909
-[2021-04-19 05:48:51,170 INFO] Starting training on CPU, could be very slow
-[2021-04-19 05:48:51,170 INFO] Start training loop and validate every 100 steps...
-[2021-04-19 05:48:51,170 INFO] corpus_1&#39;s transforms: TransformPipe()
-[2021-04-19 05:48:51,171 INFO] Loading ParallelCorpus(../data/abstract_methods/small/train_buggy.txt, ../data/edit_ops/loose/small/train.txt, align=None)...
-[2021-04-19 05:54:27,531 INFO] Step 50/  500; acc:  17.13; ppl: 1350.45; xent: 7.21; lr: 1.00000; 311/120 tok/s;    336 sec
-[2021-04-19 05:59:31,824 INFO] Step 100/  500; acc:  29.31; ppl: 85.16; xent: 4.44; lr: 1.00000; 328/132 tok/s;    641 sec
-[2021-04-19 05:59:31,825 INFO] valid&#39;s transforms: TransformPipe()
-[2021-04-19 05:59:31,825 INFO] Loading ParallelCorpus(../data/abstract_methods/small/valid_buggy.txt, ../data/edit_ops/loose/small/valid.txt, align=None)...
-[2021-04-19 06:01:09,867 INFO] Validation perplexity: 21.7216
-[2021-04-19 06:01:09,867 INFO] Validation accuracy: 41.7856
-[2021-04-19 06:06:31,322 INFO] Step 150/  500; acc:  39.13; ppl: 21.94; xent: 3.09; lr: 1.00000; 248/ 98 tok/s;   1060 sec
-[2021-04-19 06:11:13,374 INFO] Step 200/  500; acc:  40.43; ppl: 15.15; xent: 2.72; lr: 1.00000; 352/141 tok/s;   1342 sec
-[2021-04-19 06:11:13,375 INFO] Loading ParallelCorpus(../data/abstract_methods/small/valid_buggy.txt, ../data/edit_ops/loose/small/valid.txt, align=None)...
-[2021-04-19 06:12:49,123 INFO] Validation perplexity: 10.3744
-[2021-04-19 06:12:49,123 INFO] Validation accuracy: 45.433
-[2021-04-19 06:17:52,490 INFO] Step 250/  500; acc:  44.47; ppl:  9.72; xent: 2.27; lr: 1.00000; 257/102 tok/s;   1741 sec
-[2021-04-19 06:17:52,498 INFO] Saving checkpoint test_model_loose/model_step_250.pt
-[2021-04-19 06:22:49,922 INFO] Step 300/  500; acc:  44.98; ppl: 10.27; xent: 2.33; lr: 1.00000; 340/131 tok/s;   2039 sec
-[2021-04-19 06:22:49,923 INFO] Loading ParallelCorpus(../data/abstract_methods/small/valid_buggy.txt, ../data/edit_ops/loose/small/valid.txt, align=None)...
-[2021-04-19 06:24:24,262 INFO] Validation perplexity: 7.96014
-[2021-04-19 06:24:24,262 INFO] Validation accuracy: 48.6433
-[2021-04-19 06:29:28,727 INFO] Step 350/  500; acc:  47.42; ppl:  8.03; xent: 2.08; lr: 1.00000; 255/101 tok/s;   2438 sec
-[2021-04-19 06:34:41,781 INFO] Step 400/  500; acc:  48.23; ppl:  7.83; xent: 2.06; lr: 1.00000; 331/132 tok/s;   2751 sec
-[2021-04-19 06:34:41,782 INFO] Loading ParallelCorpus(../data/abstract_methods/small/valid_buggy.txt, ../data/edit_ops/loose/small/valid.txt, align=None)...
-[2021-04-19 06:36:15,558 INFO] Validation perplexity: 6.6537
-[2021-04-19 06:36:15,558 INFO] Validation accuracy: 48.908
-[2021-04-19 06:41:06,723 INFO] Step 450/  500; acc:  50.66; ppl:  6.50; xent: 1.87; lr: 1.00000; 257/102 tok/s;   3136 sec
-[2021-04-19 06:46:14,273 INFO] Step 500/  500; acc:  50.98; ppl:  6.39; xent: 1.85; lr: 1.00000; 341/133 tok/s;   3443 sec
-[2021-04-19 06:46:14,273 INFO] Loading ParallelCorpus(../data/abstract_methods/small/valid_buggy.txt, ../data/edit_ops/loose/small/valid.txt, align=None)...
-[2021-04-19 06:47:48,556 INFO] Validation perplexity: 5.85019
-[2021-04-19 06:47:48,557 INFO] Validation accuracy: 53.8096
-[2021-04-19 06:47:48,564 INFO] Saving checkpoint test_model_loose/model_step_500.pt
+[2021-04-21 05:14:39,844 INFO] encoder: 1535488
+[2021-04-21 05:14:39,844 INFO] decoder: 2184384
+[2021-04-21 05:14:39,844 INFO] * number of parameters: 3719872
+[2021-04-21 05:14:39,844 INFO] Starting training on CPU, could be very slow
+[2021-04-21 05:14:39,884 INFO] Start training loop and validate every 100 steps...
+[2021-04-21 05:14:39,884 INFO] corpus_1&#39;s transforms: TransformPipe()
+[2021-04-21 05:14:39,884 INFO] Loading ParallelCorpus(../data/abstract_methods/small/train_buggy.txt, ../data/edit_ops/loose/small/train.txt, align=None)...
+[2021-04-21 05:18:10,753 INFO] Step 50/  500; acc:  19.52; ppl: 157.85; xent: 5.06; lr: 0.00010; 476/188 tok/s;    211 sec
+[2021-04-21 05:21:36,155 INFO] Step 100/  500; acc:  25.46; ppl: 35.84; xent: 3.58; lr: 0.00010; 498/197 tok/s;    416 sec
+[2021-04-21 05:21:36,155 INFO] valid&#39;s transforms: TransformPipe()
+[2021-04-21 05:21:36,155 INFO] Loading ParallelCorpus(../data/abstract_methods/small/valid_buggy.txt, ../data/edit_ops/loose/small/valid.txt, align=None)...
+[2021-04-21 05:23:02,518 INFO] Validation perplexity: 26.0116
+[2021-04-21 05:23:02,518 INFO] Validation accuracy: 31.4569
+[2021-04-21 05:23:02,534 INFO] Saving checkpoint test_model_loose/model_step_100.pt
+[2021-04-21 05:26:30,532 INFO] Step 150/  500; acc:  29.90; ppl: 25.22; xent: 3.23; lr: 0.00010; 340/139 tok/s;    711 sec
+[2021-04-21 05:29:47,843 INFO] Step 200/  500; acc:  41.27; ppl: 16.79; xent: 2.82; lr: 0.00010; 520/204 tok/s;    908 sec
+[2021-04-21 05:29:47,851 INFO] Loading ParallelCorpus(../data/abstract_methods/small/valid_buggy.txt, ../data/edit_ops/loose/small/valid.txt, align=None)...
+[2021-04-21 05:31:17,490 INFO] Validation perplexity: 11.8986
+[2021-04-21 05:31:17,490 INFO] Validation accuracy: 45.2456
+[2021-04-21 05:31:17,498 INFO] Saving checkpoint test_model_loose/model_step_200.pt
+[2021-04-21 05:34:36,689 INFO] Step 250/  500; acc:  44.79; ppl: 11.49; xent: 2.44; lr: 0.00010; 350/140 tok/s;   1197 sec
+[2021-04-21 05:38:02,525 INFO] Step 300/  500; acc:  46.13; ppl:  9.79; xent: 2.28; lr: 0.00010; 492/190 tok/s;   1403 sec
+[2021-04-21 05:38:02,533 INFO] Loading ParallelCorpus(../data/abstract_methods/small/valid_buggy.txt, ../data/edit_ops/loose/small/valid.txt, align=None)...
+[2021-04-21 05:39:30,205 INFO] Validation perplexity: 8.9733
+[2021-04-21 05:39:30,205 INFO] Validation accuracy: 46.2908
+[2021-04-21 05:39:30,213 INFO] Saving checkpoint test_model_loose/model_step_300.pt
+[2021-04-21 05:43:01,239 INFO] Step 350/  500; acc:  45.59; ppl:  9.48; xent: 2.25; lr: 0.00010; 352/135 tok/s;   1701 sec
+[2021-04-21 05:46:17,912 INFO] Step 400/  500; acc:  46.03; ppl:  9.09; xent: 2.21; lr: 0.00010; 504/206 tok/s;   1898 sec
+[2021-04-21 05:46:17,913 INFO] Loading ParallelCorpus(../data/abstract_methods/small/valid_buggy.txt, ../data/edit_ops/loose/small/valid.txt, align=None)...
+[2021-04-21 05:47:48,058 INFO] Validation perplexity: 8.45771
+[2021-04-21 05:47:48,059 INFO] Validation accuracy: 46.5325
+[2021-04-21 05:47:48,130 INFO] Saving checkpoint test_model_loose/model_step_400.pt
+[2021-04-21 05:50:39,364 INFO] Step 450/  500; acc:  46.58; ppl:  8.85; xent: 2.18; lr: 0.00010; 395/152 tok/s;   2159 sec
+[2021-04-21 05:53:22,325 INFO] Step 500/  500; acc:  46.44; ppl:  8.87; xent: 2.18; lr: 0.00010; 615/250 tok/s;   2322 sec
+[2021-04-21 05:53:22,325 INFO] Loading ParallelCorpus(../data/abstract_methods/small/valid_buggy.txt, ../data/edit_ops/loose/small/valid.txt, align=None)...
+[2021-04-21 05:54:38,287 INFO] Validation perplexity: 8.08902
+[2021-04-21 05:54:38,287 INFO] Validation accuracy: 48.0745
+[2021-04-21 05:54:38,305 INFO] Saving checkpoint test_model_loose/model_step_500.pt
 </pre>
 </div>
 </div>
@@ -420,10 +444,10 @@ the control group, then this should be False. Defaults to True.</li>
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[2021-04-20 21:36:15,077 INFO] Translating shard 0.
+<pre>[2021-04-21 06:01:52,288 INFO] Translating shard 0.
 C:\Users\aidan\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\site-packages\onmt\translate\beam_search.py:275: UserWarning: An output with one or more elements was resized since it had shape [5], which does not match the required output shape [1, 5].This behavior is deprecated, and in a future PyTorch release outputs will not be resized unless they have zero elements. You can explicitly reuse an out tensor t by resizing it, inplace, to zero elements with t.resize_(0). (Triggered internally at  ..\aten\src\ATen\native\Resize.cpp:19.)
   torch.mul(self.topk_scores, length_penalty, out=self.topk_log_probs)
-[2021-04-20 21:36:15,215 INFO] PRED AVG SCORE: -0.6497, PRED PPL: 1.9150
+[2021-04-21 06:01:52,330 INFO] PRED AVG SCORE: -1.1582, PRED PPL: 3.1841
 </pre>
 </div>
 </div>
@@ -457,7 +481,7 @@ C:\Users\aidan\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>public TYPE_1 getType ( TYPE_2 VAR_1 ) { TYPE_3 VAR_2 = new TYPE_3 ( STRING_1 ) ; return new TYPE_1 ( VAR_2 , VAR_2 ) ; }</pre>
+<pre>private TYPE_1 getType ( TYPE_2 VAR_1 ) { ) ; return new TYPE_1 ( VAR_2 , VAR_2 ) ; }</pre>
 </div>
 
 </div>
@@ -470,7 +494,7 @@ C:\Users\aidan\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Hmmm, the <code>buggyMethod</code> and <code>outputMethod</code> look very similar. What exactly changed from the former to the latter?</p>
+<p>We can determine what exactly changed from the buggy method to the outputted method by getting the EditOperations between the two, then condensing them for easier readability.</p>
 
 </div>
 </div>
@@ -482,8 +506,8 @@ C:\Users\aidan\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">operations</span> <span class="o">=</span> <span class="n">buggyMethod</span><span class="o">.</span><span class="n">getEditOperationsTo</span><span class="p">(</span><span class="n">outputMethod</span><span class="p">)</span>
-<span class="n">operations</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">observedOperations</span> <span class="o">=</span> <span class="n">getCondensedLoose</span><span class="p">(</span><span class="n">buggyMethod</span><span class="o">.</span><span class="n">getEditOperationsTo</span><span class="p">(</span><span class="n">outputMethod</span><span class="p">))</span>
+<span class="n">observedOperations</span>
 </pre></div>
 
     </div>
@@ -498,7 +522,7 @@ C:\Users\aidan\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[REPLACE 0 -&gt; &#39;public&#39;]</pre>
+<pre>[COMPOUND_DELETE 8:15]</pre>
 </div>
 
 </div>
@@ -511,7 +535,7 @@ C:\Users\aidan\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>So there was only one operation done on the inputted buggy method, which was to replace the token at index 0 with <code>"public"</code>, i.e. <code>"private"</code> was changed to <code>"public"</code>. We can verify that these were the actual edit operations applied by the model by looking at <code>raw_output.txt</code> directly.</p>
+<p>So it seems that the changes were deletions on tokens in the index range 8:15. We can verify that these were the actual edit operations applied by the model by looking at <code>raw_output.txt</code> directly.</p>
 
 </div>
 </div>
@@ -523,8 +547,8 @@ C:\Users\aidan\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">compoundOps</span> <span class="o">=</span> <span class="n">readCompoundOperationsFromFile</span><span class="p">(</span><span class="s2">&quot;test_model_loose/raw_output.txt&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">compoundOps</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">appliedOperations</span> <span class="o">=</span> <span class="n">readCompoundOperationsFromFile</span><span class="p">(</span><span class="s2">&quot;test_model_loose/raw_output.txt&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">appliedOperations</span>
 </pre></div>
 
     </div>
@@ -539,7 +563,7 @@ C:\Users\aidan\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[COMPOUND_REPLACE 0:1 -&gt; [&#39;public&#39;]]</pre>
+<pre>[COMPOUND_DELETE 8:15]</pre>
 </div>
 
 </div>
@@ -557,7 +581,7 @@ C:\Users\aidan\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">compoundOps</span> <span class="o">==</span> <span class="n">getCondensedLoose</span><span class="p">(</span><span class="n">operations</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">appliedOperations</span> <span class="o">==</span> <span class="n">observedOperations</span>
 </pre></div>
 
     </div>
@@ -647,7 +671,7 @@ C:\Users\aidan\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>5</pre>
+<pre>11</pre>
 </div>
 
 </div>
