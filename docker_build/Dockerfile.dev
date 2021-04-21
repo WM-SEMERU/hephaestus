@@ -1,0 +1,11 @@
+FROM tensorflow/tensorflow:2.3.2-gpu-jupyter
+
+RUN apt-get update -y && \
+    apt-get install git wget vim -y
+
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir nbdev && \
+    pip install --no-cache-dir torch==1.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html && \
+    pip install --no-cache-dir OpenNMT-py==2.0.1
+
+EXPOSE 8888
