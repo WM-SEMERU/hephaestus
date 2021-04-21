@@ -102,11 +102,12 @@ class HephaestusModel:
         if saveCheckpointSteps is None:
             saveCheckpointSteps = max(trainSteps // 2, 1)
 
-        # write config file
-        self.__writeConfigFile(trainSource, trainTarget, validSource, validTarget, numGPUs = numGPUs,
-                trainSteps = trainSteps, validSteps = validSteps, saveCheckpointSteps = saveCheckpointSteps)
+        # write config file using same parameters as passed to this method, note that locals() contains self
+        HephaestusModel.__writeConfigFile(**locals())
 
-        # build vocabulary
+        # build vocabulary, first create empty files for the vocab
+        for filename in (self.__SOURCE_VOCAB_PATH, self.__TARGET_VOCAB_PATH):
+            open(filename, "w").close()
         runCommand('onmt_build_vocab -config "{}" -n_sample {}'.format(self.__CONFIG_PATH, vocabSamples))
 
         # delete previous model files
@@ -167,7 +168,7 @@ class HephaestusModel:
         if modelFile is None:
             modelFile = self.__FINAL_MODEL_PATH
         if not os.path.isfile(modelFile):
-            raise FileNotFoundError("Hephaestus: model not found -- {}".format(modelFile))
+            raise FileNotFoundError("HephaestusModel: model not found -- {}".format(modelFile))
 
         # write the AbstractMethods to a file if they were given directly
         buggyFile = None
@@ -180,10 +181,10 @@ class HephaestusModel:
         # translate the buggy methods
         command = 'onmt_translate -model "{}" -src "{}" -output "{}"'.format(modelFile, buggyFile, self.__RAW_OUTPUT_PATH)
         if getYamlParameter(self.__CONFIG_PATH, "world_size") is not None: # if GPU should be used
-            command += "-gpu 0"
+            command += " -gpu 0"
         runCommand(command)
 
-        # strip the last line of the output file, as OpenNMT likes to put a newline at the end
+        # strip the last line of the output file because OpenNMT likes to put a newline at the end
         with open(self.__RAW_OUTPUT_PATH, "r+") as outputFile:
             lines = outputFile.readlines()
             lines[-1] = lines[-1].strip()
@@ -220,7 +221,13 @@ class HephaestusModel:
         else:
             fixedMethods = readAbstractMethodsFromFile(self.__RAW_OUTPUT_PATH)
 
-        # substitute None for empty AbstractMethods and write the fixed methods to the postprocessed output file
+        # Make sure the number of fixed methods equals the number of inputted methods -- this can differ if the
+        # model fails to translate one of the inputs.
+        numFails = len(inputMethods) - len(fixedMethods)
+        if numFails > 0:
+            raise RuntimeError("HephaestusModel: failed to translate {} input(s)".format(numFails))
+
+        # write the fixed methods to the postprocessed output file, substituting null methods with blank lines
         writeAbstractMethodsToFile(
             self.__POST_OUTPUT_PATH,
             [" " if method is None else method for method in fixedMethods]
@@ -229,9 +236,9 @@ class HephaestusModel:
         # return fixed methods
         return fixedMethods if type(buggy) is list else fixedMethods[0]
 
-    def __writeConfigFile(self, *args, **kwargs) -> None:
+    def __writeConfigFile(self, **kwargs) -> None:
         """
-        Creates the config file.
+        Creates the config file. Takes the same arguments as `HephaestusMode.train`.
         """
 
         lines = [
@@ -250,20 +257,20 @@ class HephaestusModel:
             "# Data corpus",
             "data:",
             "    corpus_1:",
-            "        path_src: {}".format(args[0].replace(os.path.sep, "/")),
-            "        path_tgt: {}".format(args[1].replace(os.path.sep, "/")),
+            "        path_src: {}".format(kwargs["trainSource"].replace(os.path.sep, "/")),
+            "        path_tgt: {}".format(kwargs["trainTarget"].replace(os.path.sep, "/")),
             "        transforms: []",
             "        weight: 1",
             "    valid:",
-            "        path_src: {}".format(args[2].replace(os.path.sep, "/")),
-            "        path_tgt: {}".format(args[3].replace(os.path.sep, "/")),
+            "        path_src: {}".format(kwargs["validSource"].replace(os.path.sep, "/")),
+            "        path_tgt: {}".format(kwargs["validTarget"].replace(os.path.sep, "/")),
             "        transforms: []",
             "",
-            "# Checkpoints will be saved here",
+            "# Model parameters",
             "save_model: {}".format(self.__SAVE_MODEL_PATH.replace(os.path.sep, "/")),
-            "save_checkpoint_steps: {}".format(kwargs["saveCheckpointSteps"]),
             "train_steps: {}".format(kwargs["trainSteps"]),
             "valid_steps: {}".format(kwargs["validSteps"]),
+            "save_checkpoint_steps: {}".format(kwargs["saveCheckpointSteps"]),
             ""
         ]
 
