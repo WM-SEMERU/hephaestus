@@ -17,4 +17,4 @@ cd ..
 # you need to mount more volumes into the container
 # Also, make sure to edit the ports to fix your needs.
 docker run -d --gpus all -it -p $PORT:8888 -v $(pwd):/tf/work		\
-	-v $DATA:/tf/data --user $(id -u):$(id -g) --name $TAG $TAG
+	-v $DATA:/tf/data --user $(id -u):1003 --name $TAG $TAG
