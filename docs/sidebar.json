@@ -6,6 +6,7 @@
     "AbstractMethod": "AbstractMethod.html",
     "IOUtils": "IOUtils.html",
     "DatasetConstruction": "DatasetConstruction.html",
-    "HephaestusModel": "HephaestusModel.html"
+    "HephaestusModel": "HephaestusModel.html",
+    "TrainModels": "TrainModels.html"
   }
 }

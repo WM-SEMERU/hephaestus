@@ -8,6 +8,7 @@ from typing import Union, List, Optional, Tuple
 import os
 import subprocess
 import re
+import torch
 from copy import deepcopy
 
 import sys
@@ -17,6 +18,7 @@ from .EditOperations import *
 from .CondenseEditOperations import *
 from .AbstractMethod import *
 from .IOUtils import *
+from .DatasetConstruction import *
 
 # Cell
 class HephaestusModel:
@@ -47,7 +49,7 @@ class HephaestusModel:
 
         # create the modelDir directory if it doesn't already exist
         if not os.path.isdir(self.__MODEL_DIR):
-            os.mkdir(self.__MODEL_DIR)
+            os.makedirs(self.__MODEL_DIR)
 
     def train(self,
 
@@ -104,8 +106,8 @@ class HephaestusModel:
         - Learning options:
             - `numTrainingSteps`: Number of training steps to perform. Defaults to 50,000.
             - `numValidations`: `validSteps`: Number of validations to perform during training; e.g. if `numTrainingSteps`
-              is 50,000 and `numValidations` is 10, then validation will occur after every 5,000 training steps. Defaults to
-              10.
+              is 50,000 and `numValidations` is 10, then validation will occur after every 5,000 training steps. Defaults
+              to 10.
             - `dropout`: Dropout probability. Defaults to 0.2.
         """
 
@@ -188,7 +190,7 @@ class HephaestusModel:
         # translate the buggy methods
         command = 'onmt_translate -model "{}" -src "{}" -output "{}"'.format(modelFile, buggyFile, self.__RAW_OUTPUT_PATH)
         if getYamlParameter(self.__CONFIG_PATH, "world_size") is not None: # if GPU should be used
-            command += " -gpu 0"
+            command += " --gpu 0"
         runCommand(command)
 
         # strip the last line of the output file because OpenNMT likes to put a newline at the end
@@ -208,8 +210,8 @@ class HephaestusModel:
 
         # If edit ops should be applied, then extract the operations from the output file and attempt to
         # apply them to the input methods. Assign a None value to a fixed method if its corresponding
-        # operations were not able to be read. Copy input methods before applying edit operations so that
-        # the original remains unmodified.
+        # operations were not able to be read, or if the operations are illegal (i.e. modifies out of bounds
+        # tokens). Copy input methods before applying edit operations so that the original remains unmodified.
         fixedMethods = []
         if applyEditOperations:
             operations = readCompoundOperationsFromFile(self.__RAW_OUTPUT_PATH)
@@ -221,7 +223,7 @@ class HephaestusModel:
                         inputMethodCopy = deepcopy(inputMethod)
                         inputMethodCopy.applyEditOperations(opList)
                         fixedMethods.append(inputMethodCopy)
-                    except:
+                    except IndexError as e:
                         fixedMethods.append(None)
 
         # Simply interpret the output as abstract methods if not interpreting as edit operations
