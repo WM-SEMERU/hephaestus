@@ -116,7 +116,7 @@ def getYamlParameter(yamlFile: str, key: str) -> str:
 
     with open(yamlFile, "r") as file:
         for line in file:
-            match = re.search(r"^\s*" + key + r"\s*:\s*(.+)", line)
+            match = re.search(r"^\s*" + key + r"\s*:\s*(.+?)(?:\s+#|$)", line)
             if (match):
                 return match.group(1).strip()
 

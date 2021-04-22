@@ -18,14 +18,33 @@ index = {"InsertOperation": "00_EditOperations.ipynb",
          "getYamlParameter": "03_IOUtils.ipynb",
          "runCommand": "03_IOUtils.ipynb",
          "makeEditOpsFile": "04_DatasetConstruction.ipynb",
-         "HephaestusModel": "05_HephaestusModel.ipynb"}
+         "DATA_SMALL_METHODS_TRAIN_BUGGY": "04_DatasetConstruction.ipynb",
+         "DATA_SMALL_METHODS_TRAIN_FIXED": "04_DatasetConstruction.ipynb",
+         "DATA_SMALL_METHODS_VALID_BUGGY": "04_DatasetConstruction.ipynb",
+         "DATA_SMALL_METHODS_VALID_FIXED": "04_DatasetConstruction.ipynb",
+         "DATA_SMALL_METHODS_TEST_BUGGY": "04_DatasetConstruction.ipynb",
+         "DATA_SMALL_METHODS_TEST_FIXED": "04_DatasetConstruction.ipynb",
+         "DATA_SMALL_OPS_BASIC_TRAIN": "04_DatasetConstruction.ipynb",
+         "DATA_SMALL_OPS_BASIC_VALID": "04_DatasetConstruction.ipynb",
+         "DATA_SMALL_OPS_STRICT_TRAIN": "04_DatasetConstruction.ipynb",
+         "DATA_SMALL_OPS_STRICT_VALID": "04_DatasetConstruction.ipynb",
+         "DATA_SMALL_OPS_LOOSE_TRAIN": "04_DatasetConstruction.ipynb",
+         "DATA_SMALL_OPS_LOOSE_VALID": "04_DatasetConstruction.ipynb",
+         "HephaestusModel": "05_HephaestusModel.ipynb",
+         "MODEL_BASE_DIR": "06_TrainModels.ipynb",
+         "DEFAULT_PARAMS_DIR": "06_TrainModels.ipynb",
+         "MODEL_DEFAULT_CONTROL": "06_TrainModels.ipynb",
+         "MODEL_DEFAULT_BASIC": "06_TrainModels.ipynb",
+         "MODEL_DEFAULT_STRICT": "06_TrainModels.ipynb",
+         "MODEL_DEFAULT_LOOSE": "06_TrainModels.ipynb"}
 
 modules = ["EditOperations.py",
            "CondenseEditOperations.py",
            "AbstractMethod.py",
            "IOUtils.py",
            "DatasetConstruction.py",
-           "HephaestusModel.py"]
+           "HephaestusModel.py",
+           "TrainModels.py"]
 
 doc_url = "https://WM-SEMERU.github.io/hephaestus/"
 

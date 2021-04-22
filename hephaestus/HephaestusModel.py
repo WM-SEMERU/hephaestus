@@ -8,6 +8,7 @@ from typing import Union, List, Optional, Tuple
 import os
 import subprocess
 import re
+import torch
 from copy import deepcopy
 
 import sys
@@ -17,6 +18,7 @@ from .EditOperations import *
 from .CondenseEditOperations import *
 from .AbstractMethod import *
 from .IOUtils import *
+from .DatasetConstruction import *
 
 # Cell
 class HephaestusModel:
@@ -47,7 +49,7 @@ class HephaestusModel:
 
         # create the modelDir directory if it doesn't already exist
         if not os.path.isdir(self.__MODEL_DIR):
-            os.mkdir(self.__MODEL_DIR)
+            os.makedirs(self.__MODEL_DIR)
 
     def train(self,
 
@@ -56,58 +58,66 @@ class HephaestusModel:
         validSource: str,
         validTarget: str,
 
-        vocabSamples: int =       10000,
-        numGPUs: int =                1,
-        trainSteps: int =          1000,
-        validSteps: int =          None,
-        saveCheckpointSteps: int = None
+        numCheckpoints: int = 10,
+        numGPUs: int = 1,
+
+        embeddingSize: int = 512,
+
+        rnnType: str = "LSTM",
+        rnnSize: int = 256,
+        numLayers: int = 2,
+
+        numTrainingSteps: int = 50000,
+        numValidations: int = 10,
+        dropout: int = 0.2
 
     ) -> None:
         """
         Trains the model with the given parameters. Files containing AbstractMethods should have one per line with
         tokens separated by spaces. 'source' files must contain AbstractMethods. 'target' files may contain
-        AbstractMethods or CompoundOperations.
+        AbstractMethods or CompoundOperations in machine string format.
 
         As the training progesses, checkpoint model files are created which follow the format `model_step_#.pt`, where
         `#` corresponds to the training step number. Once training is complete, the finalized model is outputted to
         `model_final.pt`.
 
-        Required args:
-        - `trainSource`: File name contatining training source data, must be buggy AbstractMethods.
-        - `trainTarget`: File name contatining training target data, can be fixed AbstractMethods or CompoundOperations
-          describing buggy -> fixed.
-        - `validSource`: File name contatining validation source data, must be buggy AbstractMethods.
-        - `validTarget`: File name contatining validation target data, must be the same type of data provided in
-          `trainTarget`.
+        Default parameter values are such that they resemble the most successful NMT model in
+        [this paper](https://arxiv.org/pdf/1812.08693.pdf) as closely as possible.
 
-        Optional args:
-        - `vocabSamples`: Number of transformed samples per corpus to use when building vocabulary. Defaults to 10000.
-        - `numGPUs`: Number of GPUs to use concurrently during training. If set to 0, then the CPU is used. Defaults to
-          1.
-        - `trainSteps`: Number of training steps to go through. Defaults to 1000.
-        - `validSteps`: Number of training steps after which each validation occurs; e.g. if `trainSteps` is 1000 and
-          `validSteps` is 500, then validation will occur after training steps 500 and 1000. Defaults to
-          `trainSteps` / 2.
-        - `saveCheckpointSteps`: Number of training steps after which model checkpoints are saved; e.g. if `trainSteps`
-          is 1000 and 'saveCheckpointSteps' is 500, then the model will be saved in after training steps 5000 and 1000.
-          Defaults to `trainSteps` / 2.
+        Parameters:
+        - Data and vocabulary:
+            - `trainSource`: Required. File name containing training source data. Must be buggy AbstractMethods.
+            - `trainTarget`: Required. File name containing training target data. Can be either non-buggy
+              AbstractMethods or CompoundOperations in machine string format.
+            - `validSource`: Required. File name containing validation source data. Must be buggy AbstractMethods.
+            - `validTarget`: Required. File name containing validation target data. Must be the same type of data which
+              is contained in the file denoted by `trainTarget`.
+        - General options:
+            - `numCheckpoints`: Number of times a checkpoint model is saved; e.g. if `numTrainingSteps` is 50,000 and
+              `numCheckpoints` is 10, then a checkpoint will be saved after every 5,000 training steps. Defaults to 10.
+            - `numGPUs`: Number of GPUs to use concurrently during training. If set to 0, then the CPU is used. Defaults
+              to 1.
+        - Model options:
+            - `embeddingSize`: Word embedding size for source and target. Defaults to 512.
+        - Encoder/decoder options:
+            - `rnnType`: Gate type to use in RNN encoder and decoder. Can be `"LSTM"` or `"GRU"`. Defaults to `"LSTM"`.
+            - `rnnSize`: Size of encoder and decoder RNN hidden states. Defaults to 256.
+            - `numLayers`: Number of layers each in the encoder and decoder. Defaults to 2.
+        - Learning options:
+            - `numTrainingSteps`: Number of training steps to perform. Defaults to 50,000.
+            - `numValidations`: `validSteps`: Number of validations to perform during training; e.g. if `numTrainingSteps`
+              is 50,000 and `numValidations` is 10, then validation will occur after every 5,000 training steps. Defaults
+              to 10.
+            - `dropout`: Dropout probability. Defaults to 0.2.
         """
 
-        # TODO: Right now this is just the default model, we should tune the parameters so that it's
-        # somewhat specialized to our use case and it works better.
+        # write config file using same parameters as passed to this method, note that locals() contains self
+        HephaestusModel.__writeConfigFile(**locals())
 
-        # determine number of validation and checkpoint steps if none were given
-        if validSteps is None:
-            validSteps = max(trainSteps // 2, 1)
-        if saveCheckpointSteps is None:
-            saveCheckpointSteps = max(trainSteps // 2, 1)
-
-        # write config file
-        self.__writeConfigFile(trainSource, trainTarget, validSource, validTarget, numGPUs = numGPUs,
-                trainSteps = trainSteps, validSteps = validSteps, saveCheckpointSteps = saveCheckpointSteps)
-
-        # build vocabulary
-        runCommand('onmt_build_vocab -config "{}" -n_sample {}'.format(self.__CONFIG_PATH, vocabSamples))
+        # build vocabulary, first create empty files for the vocab
+        for filename in (self.__SOURCE_VOCAB_PATH, self.__TARGET_VOCAB_PATH):
+            open(filename, "w").close()
+        runCommand('onmt_build_vocab -config "{}" -n_sample -1'.format(self.__CONFIG_PATH))
 
         # delete previous model files
         for file in os.listdir(self.__MODEL_DIR):
@@ -167,7 +177,7 @@ class HephaestusModel:
         if modelFile is None:
             modelFile = self.__FINAL_MODEL_PATH
         if not os.path.isfile(modelFile):
-            raise FileNotFoundError("Hephaestus: model not found -- {}".format(modelFile))
+            raise FileNotFoundError("HephaestusModel: model not found -- {}".format(modelFile))
 
         # write the AbstractMethods to a file if they were given directly
         buggyFile = None
@@ -180,10 +190,10 @@ class HephaestusModel:
         # translate the buggy methods
         command = 'onmt_translate -model "{}" -src "{}" -output "{}"'.format(modelFile, buggyFile, self.__RAW_OUTPUT_PATH)
         if getYamlParameter(self.__CONFIG_PATH, "world_size") is not None: # if GPU should be used
-            command += "-gpu 0"
+            command += " --gpu 0"
         runCommand(command)
 
-        # strip the last line of the output file, as OpenNMT likes to put a newline at the end
+        # strip the last line of the output file because OpenNMT likes to put a newline at the end
         with open(self.__RAW_OUTPUT_PATH, "r+") as outputFile:
             lines = outputFile.readlines()
             lines[-1] = lines[-1].strip()
@@ -200,8 +210,8 @@ class HephaestusModel:
 
         # If edit ops should be applied, then extract the operations from the output file and attempt to
         # apply them to the input methods. Assign a None value to a fixed method if its corresponding
-        # operations were not able to be read. Copy input methods before applying edit operations so that
-        # the original remains unmodified.
+        # operations were not able to be read, or if the operations are illegal (i.e. modifies out of bounds
+        # tokens). Copy input methods before applying edit operations so that the original remains unmodified.
         fixedMethods = []
         if applyEditOperations:
             operations = readCompoundOperationsFromFile(self.__RAW_OUTPUT_PATH)
@@ -213,14 +223,20 @@ class HephaestusModel:
                         inputMethodCopy = deepcopy(inputMethod)
                         inputMethodCopy.applyEditOperations(opList)
                         fixedMethods.append(inputMethodCopy)
-                    except:
+                    except IndexError as e:
                         fixedMethods.append(None)
 
         # Simply interpret the output as abstract methods if not interpreting as edit operations
         else:
             fixedMethods = readAbstractMethodsFromFile(self.__RAW_OUTPUT_PATH)
 
-        # substitute None for empty AbstractMethods and write the fixed methods to the postprocessed output file
+        # Make sure the number of fixed methods equals the number of inputted methods -- this can differ if the
+        # model fails to translate one of the inputs.
+        numFails = len(inputMethods) - len(fixedMethods)
+        if numFails > 0:
+            raise RuntimeError("HephaestusModel: failed to translate {} input(s)".format(numFails))
+
+        # write the fixed methods to the postprocessed output file, substituting null methods with blank lines
         writeAbstractMethodsToFile(
             self.__POST_OUTPUT_PATH,
             [" " if method is None else method for method in fixedMethods]
@@ -229,54 +245,117 @@ class HephaestusModel:
         # return fixed methods
         return fixedMethods if type(buggy) is list else fixedMethods[0]
 
-    def __writeConfigFile(self, *args, **kwargs) -> None:
+    def __writeConfigFile(self, **kwargs) -> None:
         """
-        Creates the config file.
+        Creates the config file. Takes the same arguments as `HephaestusModel.train`.
         """
 
+        def makeHeader(label: str) -> str:
+            """Makes a nice header for the config file sections."""
+            return "#" * 80 + "\n# {0:<77}#\n".format(label) + "#" * 80
+
+        # calculate some parameters which are defined differently in OpenNMT
+        saveCheckpointSteps = max(kwargs["numTrainingSteps"] // kwargs["numCheckpoints"], 1)
+        validSteps = max(kwargs["numTrainingSteps"] // kwargs["numValidations"], 1)
+
         lines = [
-            "# AUTOGENERATED",
-            "",
-            "# Samples will be written to here",
-            "save_data: {}".format(self.__SAVE_DATA_PATH.replace(os.path.sep, "/")),
-            "",
-            "# Vocabs will be written to these files",
-            "src_vocab: {}".format(self.__SOURCE_VOCAB_PATH.replace(os.path.sep, "/")),
-            "tgt_vocab: {}".format(self.__TARGET_VOCAB_PATH.replace(os.path.sep, "/")),
-            "",
-            "# Allow overwriting existing files in the directory",
-            "overwrite: True",
-            "",
-            "# Data corpus",
-            "data:",
-            "    corpus_1:",
-            "        path_src: {}".format(args[0].replace(os.path.sep, "/")),
-            "        path_tgt: {}".format(args[1].replace(os.path.sep, "/")),
-            "        transforms: []",
-            "        weight: 1",
-            "    valid:",
-            "        path_src: {}".format(args[2].replace(os.path.sep, "/")),
-            "        path_tgt: {}".format(args[3].replace(os.path.sep, "/")),
-            "        transforms: []",
-            "",
-            "# Checkpoints will be saved here",
-            "save_model: {}".format(self.__SAVE_MODEL_PATH.replace(os.path.sep, "/")),
-            "save_checkpoint_steps: {}".format(kwargs["saveCheckpointSteps"]),
-            "train_steps: {}".format(kwargs["trainSteps"]),
-            "valid_steps: {}".format(kwargs["validSteps"]),
-            ""
+            '# AUTOGENERATED',
+            '',
+            makeHeader("GENERAL OPTIONS"),
+            '',
+            '# Base path for objects that will be saved, e.g. vocab, embeddings, etc.',
+            'save_data: "{}"'.format(self.__SAVE_DATA_PATH.replace(os.path.sep, "/")),
+            '',
+            '# Base path for saved model checkpoints',
+            'save_model: "{}"'.format(self.__SAVE_MODEL_PATH.replace(os.path.sep, "/")),
+            '',
+            '# Save a model checkpoint after X number of training steps',
+            'save_checkpoint_steps: {}'.format(saveCheckpointSteps),
+            '',
+            '# Allow overwriting existing files in the model directory',
+            'overwrite: true',
+            '',
+            makeHeader("VOCABULARY AND DATA"),
+            '',
+            '# Vocabularies will be written to these files',
+            'src_vocab: "{}"'.format(self.__SOURCE_VOCAB_PATH.replace(os.path.sep, "/")),
+            'tgt_vocab: "{}"'.format(self.__TARGET_VOCAB_PATH.replace(os.path.sep, "/")),
+            '',
+            '# Defines training and validation datasets. Data is already in the correct',
+            '# format, so no need for transforms.',
+            'data:',
+            '    corpus_1:',
+            '        path_src: "{}"'.format(kwargs["trainSource"].replace(os.path.sep, "/")),
+            '        path_tgt: "{}"'.format(kwargs["trainTarget"].replace(os.path.sep, "/")),
+            '        transforms: []',
+            '        weight: 1',
+            '    valid:',
+            '        path_src: "{}"'.format(kwargs["validSource"].replace(os.path.sep, "/")),
+            '        path_tgt: "{}"'.format(kwargs["validTarget"].replace(os.path.sep, "/")),
+            '        transforms: []',
+            '',
+            makeHeader("MODEL"),
+            '',
+            '# Overall type of model, here we use seq2seq',
+            'model_task: seq2seq',
+            '',
+            '# Attention method to use in encoder and decoder, mlp means Bahdanau',
+            'global_attention: mlp',
+            '',
+            '# Do not use an additional layer between the encoder and decoder',
+            'bridge: false',
+            '',
+            '# Word embedding size for source and target',
+            'word_vec_size: {}'.format(kwargs["embeddingSize"]),
+            '',
+            makeHeader("ENCODER / DECODER"),
+            '',
+            '# Gate type to use in RNN encoder and decoder',
+            'rnn_type: {}'.format(kwargs["rnnType"]),
+            '',
+            '# Encoder and decoder are always RNNs',
+            'encoder_type: rnn',
+            'decoder_type: rnn',
+            '',
+            '# Size of encoder and decoder RNN hidden states',
+            'rnn_size: {}'.format(kwargs["rnnSize"]),
+            '',
+            '# Number of layers in each the encoder and decoder',
+            'layers: {}'.format(kwargs["numLayers"]),
+            '',
+            makeHeader("LEARNING AND OPTIMIZATION"),
+            '',
+            '# Number of training steps to perform',
+            'train_steps: {}'.format(kwargs["numTrainingSteps"]),
+            '',
+            '# Perform validation every X number of training steps',
+            'valid_steps: {}'.format(validSteps),
+            '',
+            '# Dropout probability',
+            'dropout: {}'.format(kwargs["dropout"]),
+            '',
+            '# Use the Adam optimization method',
+            'optim: adam',
+            '',
+            '# Starting learning rate -- Tufano et al. use 0.0001',
+            'learning_rate: 0.0001',
+            ''
         ]
 
         numGPUs = kwargs["numGPUs"]
+        gpuLines = []
         if numGPUs > 0:
-            lines += [
-                "# Train using {} GPU{}".format(numGPUs, "s" if numGPUs > 1 else ""),
-                "world_size: {}".format(numGPUs),
-                "gpu_ranks:",
-                *["- {}".format(i) for i in range(numGPUs)]
+            gpuLines += [
+                '# Train using {} GPU{}'.format(numGPUs, "s" if numGPUs > 1 else ""),
+                'world_size: {}'.format(numGPUs),
+                'gpu_ranks:',
+                *["- {}".format(i) for i in range(numGPUs)],
+                ''
             ]
         else:
-            lines += ["# Train using the CPU, so no world_size provided"]
+            gpuLines += ["# Train using the CPU, so no world_size parameter is provided", ""]
+
+        lines = lines[:16] + gpuLines + lines[16:]
 
         with open(self.__CONFIG_PATH, "w") as file:
             file.write("\n".join(lines))

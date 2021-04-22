@@ -27,6 +27,9 @@ entries:
     - output: web,pdf
       title: HephaestusModel
       url: HephaestusModel.html
+    - output: web,pdf
+      title: TrainModels
+      url: TrainModels.html
     output: web
     title: hephaestus
   output: web
