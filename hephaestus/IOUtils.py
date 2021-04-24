@@ -127,11 +127,12 @@ def getYamlParameter(yamlFile: str, key: str) -> str:
 def runCommand(command: Iterable[str]) -> str:
     """
     Runs the given command in the shell and continuously prints its output. If the command failed, raises
-    a ProcessException.
+    a ProcessException. Returns the command output.
     """
 
     # run the command
     process = subprocess.Popen(command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
+    output = ""
 
     while True:
 
@@ -143,8 +144,11 @@ def runCommand(command: Iterable[str]) -> str:
 
         sys.stdout.write(line)
         sys.stdout.flush()
+        output += line.decode()
 
     exitCode = process.returncode
 
-    if exitCode != 0:
-        raise subprocess.CalledProcessError(exitCode, command, "")
+    if exitCode == 0:
+        return output
+
+    raise subprocess.CalledProcessError(exitCode, command, output)

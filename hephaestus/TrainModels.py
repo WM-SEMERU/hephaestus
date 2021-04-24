@@ -15,7 +15,7 @@ from .HephaestusModel import *
 
 # Cell
 #hide
-MODEL_BASE_DIR = "models"
+MODEL_BASE_DIR = os.path.join("..", "models")
 
 # Cell
 #hide

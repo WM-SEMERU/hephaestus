@@ -9,6 +9,7 @@ import os
 import subprocess
 import re
 import torch
+import pandas as pd
 from copy import deepcopy
 
 import sys
@@ -41,6 +42,7 @@ class HephaestusModel:
         self.__SAVE_DATA_PATH =    os.path.join(self.__MODEL_DIR, "save_data")
         self.__SOURCE_VOCAB_PATH = os.path.join(self.__MODEL_DIR, "save_data.vocab.src")
         self.__TARGET_VOCAB_PATH = os.path.join(self.__MODEL_DIR, "save_data.vocab.tgt")
+        self.__TRAIN_OUTPUT_PATH = os.path.join(self.__MODEL_DIR, "train_output.txt")
         self.__RAW_OUTPUT_PATH =   os.path.join(self.__MODEL_DIR, "raw_output.txt")
         self.__POST_OUTPUT_PATH =  os.path.join(self.__MODEL_DIR, "postprocessed_output.txt")
         self.__SAVE_MODEL_PREFIX = "model"
@@ -79,7 +81,7 @@ class HephaestusModel:
 
         As the training progesses, checkpoint model files are created which follow the format `model_step_#.pt`, where
         `#` corresponds to the training step number. Once training is complete, the finalized model is outputted to
-        `model_final.pt`.
+        `model_final.pt`. In addition, training command output is written to `train_output.txt`.
 
         Default parameter values are such that they resemble the most successful NMT model in
         [this paper](https://arxiv.org/pdf/1812.08693.pdf) as closely as possible.
@@ -124,8 +126,10 @@ class HephaestusModel:
             if re.search(r"^" + self.__SAVE_MODEL_PREFIX + r"_(?:step_[0-9]+|final).pt$", file):
                 os.remove(os.path.join(self.__MODEL_DIR, file))
 
-        # train the model
-        runCommand('onmt_train -config "{}"'.format(self.__CONFIG_PATH))
+        # train the model and write output to the appropriate file
+        trainOutput = runCommand('onmt_train -config "{}"'.format(self.__CONFIG_PATH))
+        with open(self.__TRAIN_OUTPUT_PATH, "w") as f:
+            f.write(trainOutput)
 
         # find and release the highest trained model
         latestModel = None
@@ -140,6 +144,46 @@ class HephaestusModel:
 
         if latestModel is not None:
             runCommand('onmt_release_model --model "{}" --output "{}"'.format(latestModel, self.__FINAL_MODEL_PATH))
+
+    def getTrainingStats(self) -> pd.DataFrame:
+        """
+        Returns a pandas dataframe describing training statistics; the dataframe has the following columns:
+
+        - `step`: The training step in increments of 50
+        - `trainAccuracy`: Model accuracy with respect to the **training** set
+        - `validAccuracy`: Validation accuracy. These values will likely not be present for every row.
+        - `crossEntropy`: Cross-entropy value
+        """
+
+        # create empty dataframe and initialize trainStep value
+        frame = pd.DataFrame(columns = ["step", "trainAccuracy", "validAccuracy", "crossEntropy"])
+        trainStep = -1
+
+        # read through lines of the training output file
+        with open(self.__TRAIN_OUTPUT_PATH, "r") as f:
+
+            for line in f:
+
+                line = line.strip()
+
+                # attempt to match against a line that has training accuracy and the like
+                match = re.search(r"^\[[^\]]*INFO\] *Step *(\d+)/ *\d+; *acc: *(.+?);.+?xent: *(.+?);", line)
+                if match:
+
+                    trainStep = int(match.group(1))
+                    accuracy = float(match.group(2))
+                    xEntropy = float(match.group(3))
+
+                    frame.loc[len(frame)] = [trainStep, accuracy, None, xEntropy]
+
+                # attmpt to match against a line that has validation accuracy info
+                match = re.search(r"^\[[^\]]*INFO\] *Validation accuracy: *((?:\d+\.)?\d+)", line)
+                if match and trainStep > 0:
+                    frame.at[len(frame) - 1, "validAccuracy"] = float(match.group(1))
+
+        # set the type of the "step" column to int, then return the frame
+        frame["step"] = frame["step"].astype(int)
+        return frame
 
     def translate(self,
         buggy: Union[str, AbstractMethod, List[AbstractMethod]],

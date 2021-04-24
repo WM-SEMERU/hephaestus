@@ -29,7 +29,7 @@ jobs:
       run: |
         if [ -n "$(nbdev_diff_nbs)" ]; then echo -e "!!! Detected difference between the notebooks and the library"; false; fi
     - name: Run tests
-    # run all notebooks except 05 and 06, because training the models will time out
+    # run all notebooks except 05, 06, and 07, because interacting with the models will time out
       run: |
         nbdev_test_nbs --fname nbs/00_EditOperations.ipynb
         nbdev_test_nbs --fname nbs/01_CondenseEditOperations.ipynb

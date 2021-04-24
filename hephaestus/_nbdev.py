@@ -36,7 +36,11 @@ index = {"InsertOperation": "00_EditOperations.ipynb",
          "MODEL_DEFAULT_CONTROL": "06_TrainModels.ipynb",
          "MODEL_DEFAULT_BASIC": "06_TrainModels.ipynb",
          "MODEL_DEFAULT_STRICT": "06_TrainModels.ipynb",
-         "MODEL_DEFAULT_LOOSE": "06_TrainModels.ipynb"}
+         "MODEL_DEFAULT_LOOSE": "06_TrainModels.ipynb",
+         "HephaestusModelEvaluation": "07_Experiment.ipynb",
+         "plotTrainingAccuracies": "07_Experiment.ipynb",
+         "plotPerfectPredictionAccuracies": "07_Experiment.ipynb",
+         "plotFailedPredictionRates": "07_Experiment.ipynb"}
 
 modules = ["EditOperations.py",
            "CondenseEditOperations.py",
@@ -44,7 +48,8 @@ modules = ["EditOperations.py",
            "IOUtils.py",
            "DatasetConstruction.py",
            "HephaestusModel.py",
-           "TrainModels.py"]
+           "TrainModels.py",
+           "Experiment.py"]
 
 doc_url = "https://WM-SEMERU.github.io/hephaestus/"
 
