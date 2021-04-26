@@ -38,7 +38,7 @@ def makeEditOpsFile(
 
     # make sure the number of abstract methods in both files are equal
     if len(sourceMethods) != len(targetMethods):
-        raise ValueError("makeDataset: number of methods differ in source and target files!")
+        raise ValueError("makeEditOpsFile: number of methods differ in source and target files!")
 
     # determine edit operations
     operations = []
