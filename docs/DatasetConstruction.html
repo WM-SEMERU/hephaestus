@@ -46,7 +46,7 @@ nb_path: "nbs\04_DatasetConstruction.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="makeEditOpsFile" class="doc_header"><code>makeEditOpsFile</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/DatasetConstruction.py#L22" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>makeEditOpsFile</code>(<strong><code>abstractSourceFile</code></strong>:<code>str</code>, <strong><code>abstractTargetFile</code></strong>:<code>str</code>, <strong><code>editOpsFile</code></strong>:<code>str</code>, <strong><code>condenser</code></strong>:<code>Callable</code>[<code>List</code>[<code>Union</code>[<a href="/hephaestus/EditOperations.html#InsertOperation"><code>InsertOperation</code></a>, <a href="/hephaestus/EditOperations.html#DeleteOperation"><code>DeleteOperation</code></a>, <a href="/hephaestus/EditOperations.html#ReplaceOperation"><code>ReplaceOperation</code></a>, <a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a>]], <code>List</code>[<a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a>]])</p>
+<h4 id="makeEditOpsFile" class="doc_header"><code>makeEditOpsFile</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/DatasetConstruction.py#L24" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>makeEditOpsFile</code>(<strong><code>abstractSourceFile</code></strong>:<code>str</code>, <strong><code>abstractTargetFile</code></strong>:<code>str</code>, <strong><code>editOpsFile</code></strong>:<code>str</code>, <strong><code>condenser</code></strong>:<code>Callable</code>[<code>List</code>[<code>Union</code>[<a href="/hephaestus/EditOperations.html#InsertOperation"><code>InsertOperation</code></a>, <a href="/hephaestus/EditOperations.html#DeleteOperation"><code>DeleteOperation</code></a>, <a href="/hephaestus/EditOperations.html#ReplaceOperation"><code>ReplaceOperation</code></a>, <a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a>]], <code>List</code>[<a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a>]])</p>
 </blockquote>
 <p>Determines the list of CompoundEditOperations between abstract methods given in <code>abstractSourceFile</code> and
 <code>abstractTargetFile</code>, then writes those operations in machine format to the given <code>editOpsFile</code>. The conversion
@@ -132,7 +132,8 @@ process is done with the given <code>condenser</code> function, which should be 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Paths-to-EditOperation-data-files">Paths to EditOperation data files<a class="anchor-link" href="#Paths-to-EditOperation-data-files"> </a></h3><table>
+<h3 id="Paths-to-EditOperation-data-files">Paths to EditOperation data files<a class="anchor-link" href="#Paths-to-EditOperation-data-files"> </a></h3><p>General form:</p>
+<table>
 <thead><tr>
 <th style="text-align:left">Variable name</th>
 <th style="text-align:left">Value</th>
@@ -140,28 +141,62 @@ process is done with the given <code>condenser</code> function, which should be 
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_BASIC_TRAIN"><code>DATA_SMALL_OPS_BASIC_TRAIN</code></a></td>
-<td style="text-align:left"><code>"../data/small/edit_ops/basic/train.txt"</code></td>
+<td style="text-align:left"><code>DATA_SMALL_OPS_BASIC_TRAIN</code></td>
+<td style="text-align:left"><code>"../data/small/edit_ops/general/basic/train.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_BASIC_VALID"><code>DATA_SMALL_OPS_BASIC_VALID</code></a></td>
-<td style="text-align:left"><code>"../data/small/edit_ops/basic/valid.txt"</code></td>
+<td style="text-align:left"><code>DATA_SMALL_OPS_BASIC_VALID</code></td>
+<td style="text-align:left"><code>"../data/small/edit_ops/general/basic/valid.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_STRICT_TRAIN"><code>DATA_SMALL_OPS_STRICT_TRAIN</code></a></td>
-<td style="text-align:left"><code>"../data/small/edit_ops/strict/train.txt"</code></td>
+<td style="text-align:left"><code>DATA_SMALL_OPS_STRICT_TRAIN</code></td>
+<td style="text-align:left"><code>"../data/small/edit_ops/general/strict/train.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_STRICT_VALID"><code>DATA_SMALL_OPS_STRICT_VALID</code></a></td>
-<td style="text-align:left"><code>"../data/small/edit_ops/strict/valid.txt"</code></td>
+<td style="text-align:left"><code>DATA_SMALL_OPS_STRICT_VALID</code></td>
+<td style="text-align:left"><code>"../data/small/edit_ops/general/strict/valid.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_LOOSE_TRAIN"><code>DATA_SMALL_OPS_LOOSE_TRAIN</code></a></td>
-<td style="text-align:left"><code>"../data/small/edit_ops/loose/train.txt"</code></td>
+<td style="text-align:left"><code>DATA_SMALL_OPS_LOOSE_TRAIN</code></td>
+<td style="text-align:left"><code>"../data/small/edit_ops/general/loose/train.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_LOOSE_VALID"><code>DATA_SMALL_OPS_LOOSE_VALID</code></a></td>
-<td style="text-align:left"><code>"../data/small/edit_ops/loose/valid.txt"</code></td>
+<td style="text-align:left"><code>DATA_SMALL_OPS_LOOSE_VALID</code></td>
+<td style="text-align:left"><code>"../data/small/edit_ops/general/loose/valid.txt"</code></td>
+</tr>
+</tbody>
+</table>
+<p>Typed form:</p>
+<table>
+<thead><tr>
+<th style="text-align:left">Variable name</th>
+<th style="text-align:left">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>DATA_SMALL_OPS_BASIC_TRAIN</code></td>
+<td style="text-align:left"><code>"../data/small/edit_ops/typed/basic/train.txt"</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>DATA_SMALL_OPS_BASIC_VALID</code></td>
+<td style="text-align:left"><code>"../data/small/edit_ops/typed/basic/valid.txt"</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>DATA_SMALL_OPS_STRICT_TRAIN</code></td>
+<td style="text-align:left"><code>"../data/small/edit_ops/typed/strict/train.txt"</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>DATA_SMALL_OPS_STRICT_VALID</code></td>
+<td style="text-align:left"><code>"../data/small/edit_ops/typed/strict/valid.txt"</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>DATA_SMALL_OPS_LOOSE_TRAIN</code></td>
+<td style="text-align:left"><code>"../data/small/edit_ops/typed/loose/train.txt"</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>DATA_SMALL_OPS_LOOSE_VALID</code></td>
+<td style="text-align:left"><code>"../data/small/edit_ops/typed/loose/valid.txt"</code></td>
 </tr>
 </tbody>
 </table>
@@ -171,7 +206,7 @@ process is done with the given <code>condenser</code> function, which should be 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Basic-condensed-EditOperations">Basic condensed EditOperations<a class="anchor-link" href="#Basic-condensed-EditOperations"> </a></h2>
+<h2 id="General-Form">General Form<a class="anchor-link" href="#General-Form"> </a></h2><h3 id="Basic-condensed-EditOperations">Basic condensed EditOperations<a class="anchor-link" href="#Basic-condensed-EditOperations"> </a></h3>
 </div>
 </div>
 </div>
@@ -185,8 +220,9 @@ process is done with the given <code>condenser</code> function, which should be 
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">makeEditOpsFile</span><span class="p">(</span>
     <span class="n">DATA_SMALL_METHODS_TRAIN_BUGGY</span><span class="p">,</span>
     <span class="n">DATA_SMALL_METHODS_TRAIN_FIXED</span><span class="p">,</span>
-    <span class="n">DATA_SMALL_OPS_BASIC_TRAIN</span><span class="p">,</span>
-    <span class="n">getCondensedBasic</span>
+    <span class="n">DATA_SMALL_OPS_GENERAL_BASIC_TRAIN</span><span class="p">,</span>
+    <span class="n">getCondensedBasic</span><span class="p">,</span>
+    <span class="s2">&quot;general&quot;</span>
 <span class="p">)</span>
 </pre></div>
 
@@ -207,8 +243,9 @@ process is done with the given <code>condenser</code> function, which should be 
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">makeEditOpsFile</span><span class="p">(</span>
     <span class="n">DATA_SMALL_METHODS_VALID_BUGGY</span><span class="p">,</span>
     <span class="n">DATA_SMALL_METHODS_VALID_FIXED</span><span class="p">,</span>
-    <span class="n">DATA_SMALL_OPS_BASIC_VALID</span><span class="p">,</span>
-    <span class="n">getCondensedBasic</span>
+    <span class="n">DATA_SMALL_OPS_GENERAL_BASIC_VALID</span><span class="p">,</span>
+    <span class="n">getCondensedBasic</span><span class="p">,</span>
+    <span class="s2">&quot;general&quot;</span>
 <span class="p">)</span>
 </pre></div>
 
@@ -221,7 +258,7 @@ process is done with the given <code>condenser</code> function, which should be 
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Strictly-condensed-EditOperations">Strictly condensed EditOperations<a class="anchor-link" href="#Strictly-condensed-EditOperations"> </a></h2>
+<h3 id="Strictly-condensed-EditOperations">Strictly condensed EditOperations<a class="anchor-link" href="#Strictly-condensed-EditOperations"> </a></h3>
 </div>
 </div>
 </div>
@@ -235,8 +272,9 @@ process is done with the given <code>condenser</code> function, which should be 
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">makeEditOpsFile</span><span class="p">(</span>
     <span class="n">DATA_SMALL_METHODS_TRAIN_BUGGY</span><span class="p">,</span>
     <span class="n">DATA_SMALL_METHODS_TRAIN_FIXED</span><span class="p">,</span>
-    <span class="n">DATA_SMALL_OPS_STRICT_TRAIN</span><span class="p">,</span>
-    <span class="n">getCondensedStrict</span>
+    <span class="n">DATA_SMALL_OPS_GENERAL_STRICT_TRAIN</span><span class="p">,</span>
+    <span class="n">getCondensedStrict</span><span class="p">,</span>
+    <span class="s2">&quot;general&quot;</span>
 <span class="p">)</span>
 </pre></div>
 
@@ -257,8 +295,9 @@ process is done with the given <code>condenser</code> function, which should be 
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">makeEditOpsFile</span><span class="p">(</span>
     <span class="n">DATA_SMALL_METHODS_VALID_BUGGY</span><span class="p">,</span>
     <span class="n">DATA_SMALL_METHODS_VALID_FIXED</span><span class="p">,</span>
-    <span class="n">DATA_SMALL_OPS_STRICT_VALID</span><span class="p">,</span>
-    <span class="n">getCondensedStrict</span>
+    <span class="n">DATA_SMALL_OPS_GENERAL_STRICT_VALID</span><span class="p">,</span>
+    <span class="n">getCondensedStrict</span><span class="p">,</span>
+    <span class="s2">&quot;general&quot;</span>
 <span class="p">)</span>
 </pre></div>
 
@@ -271,7 +310,7 @@ process is done with the given <code>condenser</code> function, which should be 
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Loosely-condensed-EditOperations">Loosely condensed EditOperations<a class="anchor-link" href="#Loosely-condensed-EditOperations"> </a></h2>
+<h3 id="Loosely-condensed-EditOperations">Loosely condensed EditOperations<a class="anchor-link" href="#Loosely-condensed-EditOperations"> </a></h3>
 </div>
 </div>
 </div>
@@ -285,8 +324,9 @@ process is done with the given <code>condenser</code> function, which should be 
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">makeEditOpsFile</span><span class="p">(</span>
     <span class="n">DATA_SMALL_METHODS_TRAIN_BUGGY</span><span class="p">,</span>
     <span class="n">DATA_SMALL_METHODS_TRAIN_FIXED</span><span class="p">,</span>
-    <span class="n">DATA_SMALL_OPS_LOOSE_TRAIN</span><span class="p">,</span>
-    <span class="n">getCondensedLoose</span>
+    <span class="n">DATA_SMALL_OPS_GENERAL_LOOSE_TRAIN</span><span class="p">,</span>
+    <span class="n">getCondensedLoose</span><span class="p">,</span>
+    <span class="s2">&quot;general&quot;</span>
 <span class="p">)</span>
 </pre></div>
 
@@ -307,8 +347,165 @@ process is done with the given <code>condenser</code> function, which should be 
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">makeEditOpsFile</span><span class="p">(</span>
     <span class="n">DATA_SMALL_METHODS_VALID_BUGGY</span><span class="p">,</span>
     <span class="n">DATA_SMALL_METHODS_VALID_FIXED</span><span class="p">,</span>
-    <span class="n">DATA_SMALL_OPS_LOOSE_VALID</span><span class="p">,</span>
-    <span class="n">getCondensedLoose</span>
+    <span class="n">DATA_SMALL_OPS_GENERAL_LOOSE_VALID</span><span class="p">,</span>
+    <span class="n">getCondensedLoose</span><span class="p">,</span>
+    <span class="s2">&quot;general&quot;</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Typed-form">Typed form<a class="anchor-link" href="#Typed-form"> </a></h2><h3 id="Basic-condensed-EditOperations">Basic condensed EditOperations<a class="anchor-link" href="#Basic-condensed-EditOperations"> </a></h3>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">makeEditOpsFile</span><span class="p">(</span>
+    <span class="n">DATA_SMALL_METHODS_TRAIN_BUGGY</span><span class="p">,</span>
+    <span class="n">DATA_SMALL_METHODS_TRAIN_FIXED</span><span class="p">,</span>
+    <span class="n">DATA_SMALL_OPS_TYPED_BASIC_TRAIN</span><span class="p">,</span>
+    <span class="n">getCondensedBasic</span><span class="p">,</span>
+    <span class="s2">&quot;typed&quot;</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">makeEditOpsFile</span><span class="p">(</span>
+    <span class="n">DATA_SMALL_METHODS_VALID_BUGGY</span><span class="p">,</span>
+    <span class="n">DATA_SMALL_METHODS_VALID_FIXED</span><span class="p">,</span>
+    <span class="n">DATA_SMALL_OPS_TYPED_BASIC_VALID</span><span class="p">,</span>
+    <span class="n">getCondensedBasic</span><span class="p">,</span>
+    <span class="s2">&quot;typed&quot;</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Strictly-condensed-EditOperations">Strictly condensed EditOperations<a class="anchor-link" href="#Strictly-condensed-EditOperations"> </a></h3>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">makeEditOpsFile</span><span class="p">(</span>
+    <span class="n">DATA_SMALL_METHODS_TRAIN_BUGGY</span><span class="p">,</span>
+    <span class="n">DATA_SMALL_METHODS_TRAIN_FIXED</span><span class="p">,</span>
+    <span class="n">DATA_SMALL_OPS_TYPED_STRICT_TRAIN</span><span class="p">,</span>
+    <span class="n">getCondensedStrict</span><span class="p">,</span>
+    <span class="s2">&quot;typed&quot;</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">makeEditOpsFile</span><span class="p">(</span>
+    <span class="n">DATA_SMALL_METHODS_VALID_BUGGY</span><span class="p">,</span>
+    <span class="n">DATA_SMALL_METHODS_VALID_FIXED</span><span class="p">,</span>
+    <span class="n">DATA_SMALL_OPS_TYPED_STRICT_VALID</span><span class="p">,</span>
+    <span class="n">getCondensedStrict</span><span class="p">,</span>
+    <span class="s2">&quot;typed&quot;</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Loosely-condensed-EditOperations">Loosely condensed EditOperations<a class="anchor-link" href="#Loosely-condensed-EditOperations"> </a></h3>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">makeEditOpsFile</span><span class="p">(</span>
+    <span class="n">DATA_SMALL_METHODS_TRAIN_BUGGY</span><span class="p">,</span>
+    <span class="n">DATA_SMALL_METHODS_TRAIN_FIXED</span><span class="p">,</span>
+    <span class="n">DATA_SMALL_OPS_TYPED_LOOSE_TRAIN</span><span class="p">,</span>
+    <span class="n">getCondensedLoose</span><span class="p">,</span>
+    <span class="s2">&quot;typed&quot;</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">makeEditOpsFile</span><span class="p">(</span>
+    <span class="n">DATA_SMALL_METHODS_VALID_BUGGY</span><span class="p">,</span>
+    <span class="n">DATA_SMALL_METHODS_VALID_FIXED</span><span class="p">,</span>
+    <span class="n">DATA_SMALL_OPS_TYPED_LOOSE_VALID</span><span class="p">,</span>
+    <span class="n">getCondensedLoose</span><span class="p">,</span>
+    <span class="s2">&quot;typed&quot;</span>
 <span class="p">)</span>
 </pre></div>
 

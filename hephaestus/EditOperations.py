@@ -191,18 +191,21 @@ class CompoundOperation:
     def FromMachineString(string: str) -> "CompoundOperation":
         """
         Returns a `CompoundOperation` which represents the given machine string such that the following equality holds:
-        `operation == CompoundOperation.FromMachineString(operation.getMachineString())`
+        `operation == CompoundOperation.FromMachineString(operation.getMachineString())`. The `CompoundOperation` is
+        derived from the given machine string regardless if it is of general form or typed form.
         """
 
         # first, attempt to parse the input machine string
-        match = re.search(r"^<op> (\d+) (\d+) <sep>( (?:[^ ]+ )*)</op>$", string)
+        match = re.search(r"^<(?P<type>.+?)> (?P<beginIndex>\d+) (?P<endIndex>\d+)" +
+                r" <sep>(?P<newTokens> (?:[^ ]+ )*)</(?P=type)>$", string)
         if not match:
             raise ValueError("CompoundOperation: invalid machine string: '{}'".format(string))
 
         # get compound operation attributes from match results
-        beginIndex = int(match.group(1))
-        endIndex = int(match.group(2))
-        newTokens = match.group(3).strip().split(" ")
+        _type = {"op": None, "ins": InsertOperation, "del": DeleteOperation, "rep": ReplaceOperation}[match.group("type")]
+        beginIndex = int(match.group("beginIndex"))
+        endIndex = int(match.group("endIndex"))
+        newTokens = match.group("newTokens").strip().split(" ")
         if newTokens == [""]:
             newTokens = []
 
@@ -218,14 +221,24 @@ class CompoundOperation:
         operation.__newTokens = newTokens
         operation.__setType()
 
+        # make sure that if the machine string was of typed form, that the resulting CompoundOperation has the same type
+        if _type is not None and _type != operation.getType():
+            raise ValueError("CompoundOperation: invalid machine string: '{}'".format(string))
+
         return operation
 
-    def getMachineString(self) -> str:
+    def getMachineString(self, form: str = "general") -> str:
         """
-        Returns a string formatted for use in training a machine learning model, i.e. a `HephaestusModel`. The format is
+        Returns a string formatted for use in training a machine learning model, i.e. a `HephaestusModel`. The structure is
         as follows:
 
-        `<op> beginIndex endIndex <sep> tokens </op>`
+        `<X> beginIndex endIndex <sep> tokens </X>`
+
+        The value of `X` depends on the given `form` parameter. The ouputted machine string can be of *general form* or
+        *typed form*:
+        - `"general"`: `X` will always be `"op"`, regardless of the CompoundOperation's type. Thus, the type of the operation
+          is *generalized*. This is the default behavior.
+        - `"typed"`: `X` will be one of `"ins"`, `"del"`, or `"rep"`, depending on the type of the `CompoundOperation`.
 
         The range `beginIndex:endIndex` refers to the pythonic range of tokens which the `CompoundOperation` deletes.
         Thus, if `beginIndex` and `endIndex` are equal, then no tokens are deleted. `tokens` refers to the list of tokens
@@ -233,10 +246,22 @@ class CompoundOperation:
 
         Note: this method is different from the `__str__()` method, which returns a more human-readable string.
         """
-        return "<op> {} {} <sep>{}</op>".format(
+
+        # determine tag value based on form
+        tag = ""
+        if form == "general":
+            tag = "op"
+        elif form == "typed":
+            tag = {InsertOperation: "ins", DeleteOperation: "del", ReplaceOperation: "rep"}[self.__type]
+        else:
+            raise ValueError("CompoundOperation: invalid form: {}".format(repr(form)))
+
+        return "<{}> {} {} <sep>{}</{}>".format(
+            tag,
             self.__beginIndex,
             self.__endIndex,
-            " " if len(self.__newTokens) == 0 else " " + " ".join(self.__newTokens) + " "
+            " " if len(self.__newTokens) == 0 else " " + " ".join(self.__newTokens) + " ",
+            tag
         )
 
     def __eq__(self, other: "CompoundOperation") -> bool:

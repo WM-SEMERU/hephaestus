@@ -542,7 +542,7 @@ added operations, in order.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="CompoundOperation.addLoose" class="doc_header"><code>CompoundOperation.addLoose</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/EditOperations.py#L300" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>CompoundOperation.addLoose</code>(<strong><code>operation</code></strong>:<code>Union</code>[<a href="/hephaestus/EditOperations.html#InsertOperation"><code>InsertOperation</code></a>, <a href="/hephaestus/EditOperations.html#DeleteOperation"><code>DeleteOperation</code></a>, <a href="/hephaestus/EditOperations.html#ReplaceOperation"><code>ReplaceOperation</code></a>, <code>ForwardRef('CompoundOperation')</code>])</p>
+<h4 id="CompoundOperation.addLoose" class="doc_header"><code>CompoundOperation.addLoose</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/EditOperations.py#L325" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>CompoundOperation.addLoose</code>(<strong><code>operation</code></strong>:<code>Union</code>[<a href="/hephaestus/EditOperations.html#InsertOperation"><code>InsertOperation</code></a>, <a href="/hephaestus/EditOperations.html#DeleteOperation"><code>DeleteOperation</code></a>, <a href="/hephaestus/EditOperations.html#ReplaceOperation"><code>ReplaceOperation</code></a>, <code>ForwardRef('CompoundOperation')</code>])</p>
 </blockquote>
 <p>Attempts to add the given <code>operation</code> such that it is loosely compatible with the overall <a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a>.
 This may change the type of the <a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a>. If the addition was successful, then returns True; else,
@@ -569,7 +569,7 @@ returns False.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="CompoundOperation.addStrict" class="doc_header"><code>CompoundOperation.addStrict</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/EditOperations.py#L340" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>CompoundOperation.addStrict</code>(<strong><code>operation</code></strong>:<code>Union</code>[<a href="/hephaestus/EditOperations.html#InsertOperation"><code>InsertOperation</code></a>, <a href="/hephaestus/EditOperations.html#DeleteOperation"><code>DeleteOperation</code></a>, <a href="/hephaestus/EditOperations.html#ReplaceOperation"><code>ReplaceOperation</code></a>, <code>ForwardRef('CompoundOperation')</code>])</p>
+<h4 id="CompoundOperation.addStrict" class="doc_header"><code>CompoundOperation.addStrict</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/EditOperations.py#L365" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>CompoundOperation.addStrict</code>(<strong><code>operation</code></strong>:<code>Union</code>[<a href="/hephaestus/EditOperations.html#InsertOperation"><code>InsertOperation</code></a>, <a href="/hephaestus/EditOperations.html#DeleteOperation"><code>DeleteOperation</code></a>, <a href="/hephaestus/EditOperations.html#ReplaceOperation"><code>ReplaceOperation</code></a>, <code>ForwardRef('CompoundOperation')</code>])</p>
 </blockquote>
 <p>Attempts to add the given <code>operation</code> such that it is strictly compatible with the overall <a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a>.
 If the addition was successful, then returns True; else, returns False.</p>
@@ -602,11 +602,18 @@ If the addition was successful, then returns True; else, returns False.</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="CompoundOperation.getMachineString" class="doc_header"><code>CompoundOperation.getMachineString</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/EditOperations.py#L223" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>CompoundOperation.getMachineString</code>()</p>
+<h4 id="CompoundOperation.getMachineString" class="doc_header"><code>CompoundOperation.getMachineString</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/EditOperations.py#L230" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>CompoundOperation.getMachineString</code>(<strong><code>form</code></strong>:<code>str</code>=<em><code>'general'</code></em>)</p>
 </blockquote>
-<p>Returns a string formatted for use in training a machine learning model, i.e. a <a href="/hephaestus/HephaestusModel.html"><code>HephaestusModel</code></a>. The format is
+<p>Returns a string formatted for use in training a machine learning model, i.e. a <a href="/hephaestus/HephaestusModel.html"><code>HephaestusModel</code></a>. The structure is
 as follows:</p>
-<p><code>&lt;op&gt; beginIndex endIndex &lt;sep&gt; tokens &lt;/op&gt;</code></p>
+<p><code>&lt;X&gt; beginIndex endIndex &lt;sep&gt; tokens &lt;/X&gt;</code></p>
+<p>The value of <code>X</code> depends on the given <code>form</code> parameter. The ouputted machine string can be of <em>general form</em> or
+<em>typed form</em>:</p>
+<ul>
+<li><code>"general"</code>: <code>X</code> will always be <code>"op"</code>, regardless of the CompoundOperation's type. Thus, the type of the operation
+is <em>generalized</em>. This is the default behavior.</li>
+<li><code>"typed"</code>: <code>X</code> will be one of <code>"ins"</code>, <code>"del"</code>, or <code>"rep"</code>, depending on the type of the <a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a>.</li>
+</ul>
 <p>The range <code>beginIndex:endIndex</code> refers to the pythonic range of tokens which the <a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a> deletes.
 Thus, if <code>beginIndex</code> and <code>endIndex</code> are equal, then no tokens are deleted. <code>tokens</code> refers to the list of tokens
 which are added at <code>beginIndex</code> once the aformentioned range is deleted.</p>
@@ -636,7 +643,8 @@ which are added at <code>beginIndex</code> once the aformentioned range is delet
 <h4 id="CompoundOperation.FromMachineString" class="doc_header"><code>CompoundOperation.FromMachineString</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/EditOperations.py#L191" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>CompoundOperation.FromMachineString</code>(<strong><code>string</code></strong>:<code>str</code>)</p>
 </blockquote>
 <p>Returns a <a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a> which represents the given machine string such that the following equality holds:
-<code>operation == CompoundOperation.FromMachineString(operation.getMachineString())</code></p>
+<code>operation == CompoundOperation.FromMachineString(operation.getMachineString())</code>. The <a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a> is
+derived from the given machine string regardless if it is of general form or typed form.</p>
 
 </div>
 
@@ -693,8 +701,8 @@ which are added at <code>beginIndex</code> once the aformentioned range is delet
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">machineString</span> <span class="o">=</span> <span class="n">compoundOp</span><span class="o">.</span><span class="n">getMachineString</span><span class="p">()</span>
-<span class="n">machineString</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">generalMachineString</span> <span class="o">=</span> <span class="n">compoundOp</span><span class="o">.</span><span class="n">getMachineString</span><span class="p">(</span><span class="s2">&quot;general&quot;</span><span class="p">)</span>
+<span class="n">generalMachineString</span>
 </pre></div>
 
     </div>
@@ -727,7 +735,74 @@ which are added at <code>beginIndex</code> once the aformentioned range is delet
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">CompoundOperation</span><span class="o">.</span><span class="n">FromMachineString</span><span class="p">(</span><span class="n">machineString</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">CompoundOperation</span><span class="o">.</span><span class="n">FromMachineString</span><span class="p">(</span><span class="n">generalMachineString</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>COMPOUND_REPLACE 2:4 -&gt; [&#39;return&#39;, &#39;VAR_1&#39;, &#39;;&#39;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">typedMachineString</span> <span class="o">=</span> <span class="n">compoundOp</span><span class="o">.</span><span class="n">getMachineString</span><span class="p">(</span><span class="s2">&quot;typed&quot;</span><span class="p">)</span>
+<span class="n">typedMachineString</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#39;&lt;rep&gt; 2 4 &lt;sep&gt; return VAR_1 ; &lt;/rep&gt;&#39;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">CompoundOperation</span><span class="o">.</span><span class="n">FromMachineString</span><span class="p">(</span><span class="n">typedMachineString</span><span class="p">)</span>
 </pre></div>
 
     </div>

@@ -2,9 +2,11 @@
 
 __all__ = ['makeEditOpsFile', 'DATA_SMALL_METHODS_TRAIN_BUGGY', 'DATA_SMALL_METHODS_TRAIN_FIXED',
            'DATA_SMALL_METHODS_VALID_BUGGY', 'DATA_SMALL_METHODS_VALID_FIXED', 'DATA_SMALL_METHODS_TEST_BUGGY',
-           'DATA_SMALL_METHODS_TEST_FIXED', 'DATA_SMALL_OPS_BASIC_TRAIN', 'DATA_SMALL_OPS_BASIC_VALID',
-           'DATA_SMALL_OPS_STRICT_TRAIN', 'DATA_SMALL_OPS_STRICT_VALID', 'DATA_SMALL_OPS_LOOSE_TRAIN',
-           'DATA_SMALL_OPS_LOOSE_VALID']
+           'DATA_SMALL_METHODS_TEST_FIXED', 'DATA_SMALL_OPS_GENERAL_BASIC_TRAIN', 'DATA_SMALL_OPS_GENERAL_BASIC_VALID',
+           'DATA_SMALL_OPS_GENERAL_STRICT_TRAIN', 'DATA_SMALL_OPS_GENERAL_STRICT_VALID',
+           'DATA_SMALL_OPS_GENERAL_LOOSE_TRAIN', 'DATA_SMALL_OPS_GENERAL_LOOSE_VALID',
+           'DATA_SMALL_OPS_TYPED_BASIC_TRAIN', 'DATA_SMALL_OPS_TYPED_BASIC_VALID', 'DATA_SMALL_OPS_TYPED_STRICT_TRAIN',
+           'DATA_SMALL_OPS_TYPED_STRICT_VALID', 'DATA_SMALL_OPS_TYPED_LOOSE_TRAIN', 'DATA_SMALL_OPS_TYPED_LOOSE_VALID']
 
 # Cell
 #hide
@@ -23,13 +25,14 @@ def makeEditOpsFile(
     abstractSourceFile: str,
     abstractTargetFile: str,
     editOpsFile: str,
-    condenser: Callable[[List[EditOperation]], List[CompoundOperation]]
+    condenser: Callable[[List[EditOperation]], List[CompoundOperation]],
+    form: str = "general"
 ) -> None:
     """
     Determines the list of CompoundEditOperations between abstract methods given in `abstractSourceFile` and
-    `abstractTargetFile`, then writes those operations in machine format to the given `editOpsFile`. The conversion
-    process is done with the given `condenser` function, which should be a function provided in the
-    `CondenseEditOperations` module.
+    `abstractTargetFile`, then writes those operations in machine format to the given `editOpsFile`. The form of the
+    written machine string is determined by `form`, and defaults to `"general"`. The conversion process is done with
+    the given `condenser` function, which should be a function provided in the `CondenseEditOperations` module.
     """
 
     # get the abstract methods
@@ -46,7 +49,7 @@ def makeEditOpsFile(
         operations.append(condenser(sourceMethod.getEditOperationsTo(targetMethod)))
 
     # write the edit operations to the file
-    writeCompoundOperationsToFile(editOpsFile, operations)
+    writeCompoundOperationsToFile(editOpsFile, operations, form)
 
 # Cell
 # abstract method files
@@ -60,12 +63,22 @@ DATA_SMALL_METHODS_TEST_BUGGY  = "../data/small/abstract_methods/test_buggy.txt"
 DATA_SMALL_METHODS_TEST_FIXED  = "../data/small/abstract_methods/test_fixed.txt"
 
 # Cell
-# edit operation files
-DATA_SMALL_OPS_BASIC_TRAIN = "../data/small/edit_ops/basic/train.txt"
-DATA_SMALL_OPS_BASIC_VALID = "../data/small/edit_ops/basic/valid.txt"
+# edit operation files -- general form
+DATA_SMALL_OPS_GENERAL_BASIC_TRAIN =  "../data/small/edit_ops/general/basic/train.txt"
+DATA_SMALL_OPS_GENERAL_BASIC_VALID =  "../data/small/edit_ops/general/basic/valid.txt"
 
-DATA_SMALL_OPS_STRICT_TRAIN = "../data/small/edit_ops/strict/train.txt"
-DATA_SMALL_OPS_STRICT_VALID = "../data/small/edit_ops/strict/valid.txt"
+DATA_SMALL_OPS_GENERAL_STRICT_TRAIN = "../data/small/edit_ops/general/strict/train.txt"
+DATA_SMALL_OPS_GENERAL_STRICT_VALID = "../data/small/edit_ops/general/strict/valid.txt"
 
-DATA_SMALL_OPS_LOOSE_TRAIN = "../data/small/edit_ops/loose/train.txt"
-DATA_SMALL_OPS_LOOSE_VALID = "../data/small/edit_ops/loose/valid.txt"
+DATA_SMALL_OPS_GENERAL_LOOSE_TRAIN =  "../data/small/edit_ops/general/loose/train.txt"
+DATA_SMALL_OPS_GENERAL_LOOSE_VALID =  "../data/small/edit_ops/general/loose/valid.txt"
+
+# edit operation files -- typed form
+DATA_SMALL_OPS_TYPED_BASIC_TRAIN =  "../data/small/edit_ops/typed/basic/train.txt"
+DATA_SMALL_OPS_TYPED_BASIC_VALID =  "../data/small/edit_ops/typed/basic/valid.txt"
+
+DATA_SMALL_OPS_TYPED_STRICT_TRAIN = "../data/small/edit_ops/typed/strict/train.txt"
+DATA_SMALL_OPS_TYPED_STRICT_VALID = "../data/small/edit_ops/typed/strict/valid.txt"
+
+DATA_SMALL_OPS_TYPED_LOOSE_TRAIN =  "../data/small/edit_ops/typed/loose/train.txt"
+DATA_SMALL_OPS_TYPED_LOOSE_VALID =  "../data/small/edit_ops/typed/loose/valid.txt"

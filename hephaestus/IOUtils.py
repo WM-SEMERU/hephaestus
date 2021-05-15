@@ -67,7 +67,7 @@ def readCompoundOperationsFromFile(file: str) -> List[Optional[List[CompoundOper
 
                 # match the beginning of the line to the machine string pattern
                 line = line.strip()
-                match = re.search(r"^<op>.*?</op>", line)
+                match = re.search(r"^<.+?>.*?</.+?>", line)
 
                 # if the match succeeded, then attempt to remove the operation from the line and add it to lineOps
                 if match:
@@ -86,10 +86,10 @@ def readCompoundOperationsFromFile(file: str) -> List[Optional[List[CompoundOper
     return operations
 
 # Cell
-def writeCompoundOperationsToFile(file: str, operations: List[List[CompoundOperation]]) -> None:
+def writeCompoundOperationsToFile(file: str, operations: List[List[CompoundOperation]], form: str = "general") -> None:
     """
-    Writes the given list of lists of CompoundOperations to the given `file`. Each list of operations occupies one
-    line. Operations are represented by their machine strings.
+    Writes the given list of lists of CompoundOperations to the given `file` in the machine string form given by `form`
+    (defaults to `"general"`). Each list of operations occupies one line.
     """
 
     with open(file, "w") as f:
@@ -98,7 +98,7 @@ def writeCompoundOperationsToFile(file: str, operations: List[List[CompoundOpera
 
             for j in range(len(operations[i])):
 
-                f.write(operations[i][j].getMachineString())
+                f.write(operations[i][j].getMachineString(form))
 
                 if j < len(operations[i]) - 1:
                     f.write(" ")
