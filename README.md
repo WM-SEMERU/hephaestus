@@ -23,6 +23,9 @@ Hephaestus requires the following Python dependencies:
     ```
     pip install OpenNMT-py==2.0.1 --no-deps
     ```
+    
+    Note that parts of the Hephaestus library call OpenNMT command line tools, and these tools are expected to be in the `PATH`     environment variable. Pip will install the command line tools in the Python `Scripts` directory, so you will need to add       this directory to `PATH` if it isn't there already.
+    
 
 - PyTorch (version >= 1.6.0)
 
@@ -55,9 +58,13 @@ Once the dependencies have been installed, clone the repository with:
 git clone https://github.com/WM-SEMERU/hephaestus.git
 ```
 
-From there, feel free to run the Jupyter notebooks in the `nbs` directory to your heart's content!
+Your installation is now complete.
 
-This project was built using [nbdev](https://nbdev.fast.ai/). If you would like to modify the Hephaestus library for research purposes, then you must install nbdev according to the instructions in the link above.
+## Reproduction and further research
+
+To reproduce the results of this project, run the notebooks 06_TrainModels and 07_Experiment, in order. Due to the random nature of training the models, your results may come out slightly differently than those in the `Documentation`.
+
+This project was built using [nbdev](https://nbdev.fast.ai/#Installing). If you would like to modify the Hephaestus library for research purposes, then you must install nbdev according to the instructions in the link above.
 
 ## Documentation
 

@@ -46,12 +46,12 @@ nb_path: "nbs\04_DatasetConstruction.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="makeEditOpsFile" class="doc_header"><code>makeEditOpsFile</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/DatasetConstruction.py#L24" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>makeEditOpsFile</code>(<strong><code>abstractSourceFile</code></strong>:<code>str</code>, <strong><code>abstractTargetFile</code></strong>:<code>str</code>, <strong><code>editOpsFile</code></strong>:<code>str</code>, <strong><code>condenser</code></strong>:<code>Callable</code>[<code>List</code>[<code>Union</code>[<a href="/hephaestus/EditOperations.html#InsertOperation"><code>InsertOperation</code></a>, <a href="/hephaestus/EditOperations.html#DeleteOperation"><code>DeleteOperation</code></a>, <a href="/hephaestus/EditOperations.html#ReplaceOperation"><code>ReplaceOperation</code></a>, <a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a>]], <code>List</code>[<a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a>]])</p>
+<h4 id="makeEditOpsFile" class="doc_header"><code>makeEditOpsFile</code><a href="https://github.com/WM-SEMERU/hephaestus/tree/main/hephaestus/DatasetConstruction.py#L24" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>makeEditOpsFile</code>(<strong><code>abstractSourceFile</code></strong>:<code>str</code>, <strong><code>abstractTargetFile</code></strong>:<code>str</code>, <strong><code>editOpsFile</code></strong>:<code>str</code>, <strong><code>condenser</code></strong>:<code>Callable</code>[<code>List</code>[<code>Union</code>[<a href="/hephaestus/EditOperations.html#InsertOperation"><code>InsertOperation</code></a>, <a href="/hephaestus/EditOperations.html#DeleteOperation"><code>DeleteOperation</code></a>, <a href="/hephaestus/EditOperations.html#ReplaceOperation"><code>ReplaceOperation</code></a>, <a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a>]], <code>List</code>[<a href="/hephaestus/EditOperations.html#CompoundOperation"><code>CompoundOperation</code></a>]], <strong><code>form</code></strong>:<code>str</code>=<em><code>'general'</code></em>)</p>
 </blockquote>
 <p>Determines the list of CompoundEditOperations between abstract methods given in <code>abstractSourceFile</code> and
-<code>abstractTargetFile</code>, then writes those operations in machine format to the given <code>editOpsFile</code>. The conversion
-process is done with the given <code>condenser</code> function, which should be a function provided in the
-<a href="/hephaestus/CondenseEditOperations.html"><code>CondenseEditOperations</code></a> module.</p>
+<code>abstractTargetFile</code>, then writes those operations in machine format to the given <code>editOpsFile</code>. The form of the
+written machine string is determined by <code>form</code>, and defaults to <code>"general"</code>. The conversion process is done with
+the given <code>condenser</code> function, which should be a function provided in the <a href="/hephaestus/CondenseEditOperations.html"><code>CondenseEditOperations</code></a> module.</p>
 
 </div>
 
@@ -141,27 +141,27 @@ process is done with the given <code>condenser</code> function, which should be 
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>DATA_SMALL_OPS_BASIC_TRAIN</code></td>
+<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_GENERAL_BASIC_TRAIN"><code>DATA_SMALL_OPS_GENERAL_BASIC_TRAIN</code></a></td>
 <td style="text-align:left"><code>"../data/small/edit_ops/general/basic/train.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>DATA_SMALL_OPS_BASIC_VALID</code></td>
+<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_GENERAL_BASIC_VALID"><code>DATA_SMALL_OPS_GENERAL_BASIC_VALID</code></a></td>
 <td style="text-align:left"><code>"../data/small/edit_ops/general/basic/valid.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>DATA_SMALL_OPS_STRICT_TRAIN</code></td>
+<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_GENERAL_STRICT_TRAIN"><code>DATA_SMALL_OPS_GENERAL_STRICT_TRAIN</code></a></td>
 <td style="text-align:left"><code>"../data/small/edit_ops/general/strict/train.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>DATA_SMALL_OPS_STRICT_VALID</code></td>
+<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_GENERAL_STRICT_VALID"><code>DATA_SMALL_OPS_GENERAL_STRICT_VALID</code></a></td>
 <td style="text-align:left"><code>"../data/small/edit_ops/general/strict/valid.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>DATA_SMALL_OPS_LOOSE_TRAIN</code></td>
+<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_GENERAL_LOOSE_TRAIN"><code>DATA_SMALL_OPS_GENERAL_LOOSE_TRAIN</code></a></td>
 <td style="text-align:left"><code>"../data/small/edit_ops/general/loose/train.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>DATA_SMALL_OPS_LOOSE_VALID</code></td>
+<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_GENERAL_LOOSE_VALID"><code>DATA_SMALL_OPS_GENERAL_LOOSE_VALID</code></a></td>
 <td style="text-align:left"><code>"../data/small/edit_ops/general/loose/valid.txt"</code></td>
 </tr>
 </tbody>
@@ -175,27 +175,27 @@ process is done with the given <code>condenser</code> function, which should be 
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>DATA_SMALL_OPS_BASIC_TRAIN</code></td>
+<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_TYPED_BASIC_TRAIN"><code>DATA_SMALL_OPS_TYPED_BASIC_TRAIN</code></a></td>
 <td style="text-align:left"><code>"../data/small/edit_ops/typed/basic/train.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>DATA_SMALL_OPS_BASIC_VALID</code></td>
+<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_TYPED_BASIC_VALID"><code>DATA_SMALL_OPS_TYPED_BASIC_VALID</code></a></td>
 <td style="text-align:left"><code>"../data/small/edit_ops/typed/basic/valid.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>DATA_SMALL_OPS_STRICT_TRAIN</code></td>
+<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_TYPED_STRICT_TRAIN"><code>DATA_SMALL_OPS_TYPED_STRICT_TRAIN</code></a></td>
 <td style="text-align:left"><code>"../data/small/edit_ops/typed/strict/train.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>DATA_SMALL_OPS_STRICT_VALID</code></td>
+<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_TYPED_STRICT_VALID"><code>DATA_SMALL_OPS_TYPED_STRICT_VALID</code></a></td>
 <td style="text-align:left"><code>"../data/small/edit_ops/typed/strict/valid.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>DATA_SMALL_OPS_LOOSE_TRAIN</code></td>
+<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_TYPED_LOOSE_TRAIN"><code>DATA_SMALL_OPS_TYPED_LOOSE_TRAIN</code></a></td>
 <td style="text-align:left"><code>"../data/small/edit_ops/typed/loose/train.txt"</code></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>DATA_SMALL_OPS_LOOSE_VALID</code></td>
+<td style="text-align:left"><a href="/hephaestus/DatasetConstruction.html#DATA_SMALL_OPS_TYPED_LOOSE_VALID"><code>DATA_SMALL_OPS_TYPED_LOOSE_VALID</code></a></td>
 <td style="text-align:left"><code>"../data/small/edit_ops/typed/loose/valid.txt"</code></td>
 </tr>
 </tbody>

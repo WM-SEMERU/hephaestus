@@ -47,7 +47,10 @@ nb_path: "nbs\index.ipynb"
 <p>If the above command fails because dependencies were not able to be installed, then use:</p>
 
 <pre><code>  pip install OpenNMT-py==2.0.1 --no-deps</code></pre>
+<p>Note that parts of the Hephaestus library call OpenNMT command line tools, and these tools are expected to be in the <code>PATH</code>     environment variable. Pip will install the command line tools in the Python <code>Scripts</code> directory, so you will need to add       this directory to <code>PATH</code> if it isn't there already.</p>
 </li>
+</ul>
+<ul>
 <li><p>PyTorch (version &gt;= 1.6.0)</p>
 
 <pre><code>  pip install torch&gt;=1.6.0+cu111</code></pre>
@@ -68,8 +71,15 @@ nb_path: "nbs\index.ipynb"
 <p>Once the dependencies have been installed, clone the repository with:</p>
 
 <pre><code>git clone https://github.com/WM-SEMERU/hephaestus.git</code></pre>
-<p>From there, feel free to run the Jupyter notebooks in the <code>nbs</code> directory to your heart's content!</p>
-<p>This project was built using <a href="https://nbdev.fast.ai/">nbdev</a>. If you would like to modify the Hephaestus library for research purposes, then you must install nbdev according to the instructions in the link above.</p>
+<p>Your installation is now complete.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Reproduction-and-further-research">Reproduction and further research<a class="anchor-link" href="#Reproduction-and-further-research"> </a></h2><p>To reproduce the results of this project, run the notebooks 06_TrainModels and 07_Experiment, in order. Due to the random nature of training the models, your results may come out slightly differently than those in the <code>Documentation</code>.</p>
+<p>This project was built using <a href="https://nbdev.fast.ai/#Installing">nbdev</a>. If you would like to modify the Hephaestus library for research purposes, then you must install nbdev according to the instructions in the link above.</p>
 
 </div>
 </div>
