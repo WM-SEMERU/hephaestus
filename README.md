@@ -62,7 +62,7 @@ Your installation is now complete.
 
 ## Reproduction and further research
 
-To reproduce the results of this project, run the notebooks 06_TrainModels and 07_Experiment, in order. Due to the random nature of training the models, your results may come out slightly differently than those in the `Documentation`.
+To reproduce the results of this project, run the notebooks 06_TrainModels and 07_Experiment, in order. Due to the random nature of training the models, your results may come out slightly differently than those in the [Documentation](https://wm-semeru.github.io/hephaestus/).
 
 This project was built using [nbdev](https://nbdev.fast.ai/#Installing). If you would like to modify the Hephaestus library for research purposes, then you must install nbdev according to the instructions in the link above.
 
